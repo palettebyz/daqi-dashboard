@@ -225,7 +225,6 @@ tr.tot td{border-top:1px solid var(--line);font-weight:600}
 <main class="wrap">
 <div id="pane-dash" role="tabpanel" aria-labelledby="tab-dash">
   <div class="notice"><span><b>집계 데이터</b> 응답 <span id="nTotal">0</span>건(G1. 교육 수강자 <span id="nG1">0</span>명 · G2. 잠재 학습자 <span id="nG2">0</span>명)<span id="nTail"> · 집계 데이터를 불러오는 중입니다.</span></span>
-    <label class="chk" for="cutLive"><input type="checkbox" id="cutLive"> 09:00 이후 응답도 포함 (실시간)</label>
     <label class="btn" for="csv" hidden>CSV 불러오기<input type="file" id="csv" accept=".csv,text/csv" multiple hidden></label>
     <button class="btn" id="reset" hidden></button></div>
 
@@ -309,7 +308,6 @@ tr.tot td{border-top:1px solid var(--line);font-weight:600}
 
 <div id="pane-sv" role="tabpanel" aria-labelledby="tab-sv" hidden>
   <div class="notice"><span><b data-d="1">집계 데이터</b> 대상자별 설문 링크와 응답 현황입니다.<span id="nTail2"></span></span>
-    <label class="chk" for="cutLive2"><input type="checkbox" id="cutLive2"> 09:00 이후 응답도 포함 (실시간)</label>
     <label class="btn" for="csv2" hidden>CSV 불러오기<input type="file" id="csv2" accept=".csv,text/csv" multiple hidden></label>
     <button class="btn" id="reset2" hidden></button></div>
 
@@ -344,13 +342,7 @@ tr.tot td{border-top:1px solid var(--line);font-weight:600}
     <div class="pager" id="oPager"></div>
   </section>
 
-  <section class="card" style="margin-top:16px"><h2>데이터 갱신</h2><p class="sub">이 화면이 보여 주는 응답과 방문 기록</p>
-    <p class="note">이 화면은 열 때마다 최신 응답을 불러오고, 열어 두는 동안 10분마다 다시 불러옵니다. 설문에 응답이 들어온 뒤 여기에 보이기까지 몇 분쯤 걸릴 수 있습니다.</p>
-    <p class="note">기본 집계 기준은 <b>매일 오전 09:00</b>입니다. 위쪽의 <b>'09:00 이후 응답도 포함 (실시간)'</b>을 체크하면 지금까지 들어온 응답을 모두 보여 줍니다. 방문 수는 하루에 한 번(오전) 갱신됩니다.</p>
-    <p class="note">성명·휴대전화번호는 이 화면에 들어오지 않습니다.</p>
-    <p class="note" id="shMsg"></p>
-    <div hidden><input type="url" id="shUrl"><input type="url" id="shUrl2"><input type="url" id="shUrl3"><button id="shGo"></button><input type="checkbox" id="shAuto"></div>
-  </section>
+  <div hidden><p id="shMsg"></p><input type="url" id="shUrl"><input type="url" id="shUrl2"><input type="url" id="shUrl3"><button id="shGo"></button><input type="checkbox" id="shAuto"><input type="checkbox" id="cutLive" checked><input type="checkbox" id="cutLive2" checked></div>
 </div>
 
 <div class="mwrap" id="msgModal" hidden>
@@ -2870,7 +2862,7 @@ const kstISO=m=>new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]+TZ_H,+m[5])).toISOSt
 const kstDate=v=>{const m=atParts(v);return m?kstISO(m).slice(0,10):dateOf(v);};
 const kstAt=v=>{const m=atParts(v);return m?kstISO(m).slice(0,16).replace('T',' '):'';};
 // 집계 기준: 매일 오전 09:00(한국 시간). 구글시트에서 자동으로 불러온 응답은 기준 시각 이전 것만 집계
-const CUT_H=9;let cutOn=false,cutLive=false,cutInfo=null,srcKind='sample',pubFail=false;
+const CUT_H=9;let cutOn=false,cutLive=true,cutInfo=null,srcKind='sample',pubFail=false;
 function cutPoint(now){const k=new Date((now||Date.now())+TZ_H*3600e3);if(k.getUTCHours()<CUT_H)k.setUTCDate(k.getUTCDate()-1);return k.toISOString().slice(0,10)+' '+String(CUT_H).padStart(2,'0')+':00';}
 function applyCut(rows){
   if(!cutOn){cutInfo=null;return rows;}
@@ -2881,9 +2873,9 @@ function setTail(){
   const t=srcKind==='sample'?(pubFail?' · 집계 데이터를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로 고쳐 주십시오.':' · 집계 데이터를 불러오는 중입니다.')
     :srcKind==='file'?' · 불러온 파일 기준입니다.'
     :cutInfo&&cutInfo.at?` · 집계 기준 ${cutInfo.at} (매일 오전 09:00 기준)${cutInfo.late?` · 기준 시각 이후 응답 ${cutInfo.late}건은 다음 집계에 반영됩니다`:''}`
-    :' · 지금까지 들어온 응답 전체입니다 (실시간)';
+    :'';
   const a=$('#nTail'),b=$('#nTail2');if(a)a.textContent=t;
-  if(b)b.textContent=srcKind==='sheet'?(cutInfo&&cutInfo.at?` 집계 기준 ${cutInfo.at} (매일 오전 09:00)${cutInfo.late?` · 이후 응답 ${cutInfo.late}건은 다음 집계에 반영`:''}`:' 지금까지 들어온 응답 전체 (실시간)'):'';}
+  if(b)b.textContent=srcKind==='sheet'?(cutInfo&&cutInfo.at?` 집계 기준 ${cutInfo.at} (매일 오전 09:00)${cutInfo.late?` · 이후 응답 ${cutInfo.late}건은 다음 집계에 반영`:''}`:''):'';}
 // Tally에서 내려받은 원본 CSV → 응답데이터 형식. 문항은 머리글 문구로 찾고(열 순서 무관), 같은 머리글이 둘이면 응답이 많은 열을 씀. 성명·휴대전화 열은 읽지 않음
 function tallyRows(tb,hi){
   const H=tb[hi].map(norm),body=tb.slice(hi+1).filter(r=>r.some(c=>norm(c)!==''));
