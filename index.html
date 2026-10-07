@@ -1,0 +1,3256 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DAQI_EL 조사 대시보드</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F3F5F7; --panel:#FFFFFF; --ink:#18212E; --ink2:#4A5566; --ink3:#7A8594; --line:#DCE1E7; --soft:#EBEEF2;
+  --acc:#1F4E79; --acc2:#3E7CB1; --accsoft:#E3ECF5; --amber:#B7791F; --ambersoft:#FBF1DF; --teal:#1C6E6A; --teal2:#4E9C97;
+  --hl:#C2410C; --hlsoft:#FCEBDD; --good:#2E7D5B; --goodsoft:#E2F2EA; --warn:#B7791F; --warnsoft:#FBF1DF; --bad:#B23A3A; --badsoft:#F8E3E3;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151C; --panel:#18202A; --ink:#E6EBF1; --ink2:#AAB4C0; --ink3:#7F8A97; --line:#2B3542; --soft:#212B37;
+  --acc:#7FB0DE; --acc2:#9CC4EA; --accsoft:#1E3247; --amber:#E0A94F; --ambersoft:#3A2E19; --teal:#6CC3BC; --teal2:#4E9C97;
+  --hl:#F08A4B; --hlsoft:#3A2418; --good:#5FBF92; --goodsoft:#18352A; --warn:#E0A94F; --warnsoft:#3A2E19; --bad:#E07A7A; --badsoft:#3E1F22;}}
+:root[data-theme="dark"]{
+  --bg:#10151C; --panel:#18202A; --ink:#E6EBF1; --ink2:#AAB4C0; --ink3:#7F8A97; --line:#2B3542; --soft:#212B37;
+  --acc:#7FB0DE; --acc2:#9CC4EA; --accsoft:#1E3247; --amber:#E0A94F; --ambersoft:#3A2E19; --teal:#6CC3BC; --teal2:#4E9C97;
+  --hl:#F08A4B; --hlsoft:#3A2418; --good:#5FBF92; --goodsoft:#18352A; --warn:#E0A94F; --warnsoft:#3A2E19; --bad:#E07A7A; --badsoft:#3E1F22;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .in{max-width:1240px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 24px}
+.brand{flex:1 1 320px}
+.brand .eyebrow{font-size:11.5px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase}
+.brand h1{font-size:19px;margin:2px 0 10px;font-weight:700;text-wrap:balance}
+.tabs{display:flex;gap:4px}
+.tab{appearance:none;border:1px solid var(--line);border-bottom:none;background:transparent;color:var(--ink2);padding:9px 16px;border-radius:8px 8px 0 0;font:600 13.5px var(--sans);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--panel);color:var(--acc);border-color:var(--line)}
+.tab:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--acc2);outline-offset:2px}
+.notice{margin:16px 0 0;padding:10px 14px;border-radius:8px;background:var(--ambersoft);color:var(--ink);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.notice b{color:var(--amber)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:16px 0}
+.bar label{font-size:12.5px;color:var(--ink2);display:flex;gap:6px;align-items:center}
+select,.btn{font:500 13px var(--sans);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+.btn{cursor:pointer}
+.btn.primary{background:var(--acc);color:var(--panel);border-color:var(--acc)}
+.btn:disabled{opacity:.45;cursor:default}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .l{font-size:12px;color:var(--ink3)}
+.kpi .v{font:600 28px/1.15 var(--mono);margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .v small{font:500 13px var(--sans);color:var(--ink2);margin-left:6px}
+.kpi .s{font-size:12px;color:var(--ink2);margin-top:4px}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+section.card h2{font-size:15px;margin:0;font-weight:600}
+section.card .sub{font-size:12px;color:var(--ink3);margin:2px 0 12px}
+.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.three{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.hbar{display:grid;grid-template-columns:minmax(90px,38%) 1fr 52px;gap:6px 10px;align-items:center;font-size:12.5px}
+.hbar .nm{color:var(--ink2);overflow-wrap:anywhere}
+.hbar .tr{height:14px;background:var(--soft);border-radius:3px;position:relative;overflow:hidden}
+.hbar .fl{position:absolute;inset:0 auto 0 0;background:var(--acc2);border-radius:3px}
+.hbar .fl.top{background:var(--acc)}
+.hbar .vl{font:500 12px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th{font-weight:600;color:var(--ink2);font-size:11.5px;background:var(--soft)}
+td.l,th.l{text-align:left}
+td.num{font-family:var(--mono)}
+td.low{color:var(--bad);font-weight:600}
+.pill{display:inline-block;min-width:24px;padding:1px 7px;border-radius:999px;font:600 11.5px var(--mono)}
+.g-S,.g-A{background:var(--goodsoft);color:var(--good)} .g-B{background:var(--accsoft);color:var(--acc)} .g-C{background:var(--warnsoft);color:var(--warn)} .g-D{background:var(--badsoft);color:var(--bad)}
+.chip{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11.5px;font-weight:600;border:1px solid currentColor}
+.t-핵심경쟁{color:var(--good)} .t-확장가능{color:var(--acc)} .t-우선개선{color:var(--warn)} .t-재구조화{color:var(--bad)} .t-수요미조사{color:var(--ink3)}
+.muted{color:var(--ink3)} .rk{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:var(--panel);font:600 11px var(--mono);margin-right:6px}
+.r-ref td{color:var(--ink2)} .r-ref td b{font-weight:500} .r-merge td{background:var(--soft)}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
+.ib{display:inline-block;width:70px;height:6px;border-radius:3px;background:var(--soft);vertical-align:middle;margin-right:8px;overflow:hidden}
+.ib span{display:block;height:100%;background:var(--teal2)}
+.note{font-size:11.5px;color:var(--ink3);margin-top:10px}
+svg text{fill:var(--ink2);font-family:var(--sans)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:var(--ink2);margin-top:8px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.split h3{font-size:12.5px;margin:0 0 6px;color:var(--ink2);font-weight:600}
+.dlayout{display:grid;grid-template-columns:148px minmax(0,1fr);gap:24px;align-items:start}
+.rail{position:sticky;top:var(--railtop,92px);display:flex;flex-direction:column;gap:1px;font-size:12px;padding:12px 0 12px 10px;border-left:1px solid var(--line);margin-top:8px}
+.rail-cap{font:600 10.5px var(--mono);letter-spacing:.12em;color:var(--ink3);margin:0 0 6px}
+.rail a{color:var(--ink3);text-decoration:none;padding:3px 8px;border-radius:5px;margin-left:-11px;border-left:2px solid transparent;line-height:1.35}
+.rail a:hover{color:var(--ink)}
+.rail .rp{font-weight:600;color:var(--ink2);margin-top:10px}
+.rail .rp:first-of-type{margin-top:0}
+.rail .rs{padding-left:26px;font-size:11.5px}
+.rail .rn{display:inline-grid;place-items:center;min-width:15px;padding:0 3px;font-family:var(--sans)!important;height:15px;border-radius:4px;background:var(--soft);font:600 10px var(--mono);margin-right:6px}
+.rail a.on{color:var(--ink);background:var(--panel);border-left-color:var(--pc,var(--acc))}
+.rail .rp-q,.rail .rs.pq{--pc:var(--acc)} .rail .rp-d,.rail .rs.pd{--pc:var(--teal)} .rail .rp-p{--pc:var(--ink3)}
+.rail .rp.in{color:var(--pc)} .rail .rp.in .rn{background:var(--pc);color:var(--panel)}
+.card[id]{scroll-margin-top:110px}
+@media (min-width:1001px){.dlayout .toc{display:none}}
+@media (max-width:1000px){.dlayout{display:block}.rail{display:none}}
+.toc{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:12.5px;margin:0 0 8px}
+.toc a{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:4px 10px;border-radius:999px}
+.toc a:hover{border-color:var(--ink3)}
+.toc .toc-q{border-color:var(--acc);color:var(--acc)} .toc .toc-d{border-color:var(--teal);color:var(--teal)}
+.part{margin-top:28px;padding-top:0;scroll-margin-top:110px}
+.part-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:6px 20px;padding:14px 0 12px;margin-bottom:16px;border-top:4px solid var(--pc);border-bottom:1px solid var(--line)}
+.part-h h2{font-size:21px;margin:2px 0 0;font-weight:700;color:var(--ink);text-wrap:balance}
+.part-h p{margin:0;font-size:12.5px;color:var(--ink2)}
+.part-no{font:700 12.5px var(--sans);letter-spacing:.02em;color:var(--pc)}
+.part-q{--pc:var(--acc)} .part-d{--pc:var(--teal)} .part-p{--pc:var(--ink3)}
+.part-d .hbar .fl{background:var(--teal2)} .part-d .hbar .fl.top{background:var(--teal)}
+/* survey */
+.sv{max-width:720px;margin:20px auto 0}
+.sv .prog{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink3);margin-bottom:10px}
+.sv .prog .tr{flex:1;height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.sv .prog .fl{height:100%;background:var(--acc)}
+.sv .course{font-size:12px;color:var(--acc);background:var(--accsoft);padding:3px 10px;border-radius:999px;display:inline-block;margin-bottom:10px}
+.svtop{display:grid;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink3)}
+.steps li{display:flex;align-items:center;gap:6px}
+.steps li span{display:inline-grid;place-items:center;min-width:20px;height:18px;padding:0 4px;border-radius:9px;font-family:var(--sans)!important;border:1px solid var(--line);font:600 10.5px var(--mono);background:var(--panel)}
+.steps li.cur{color:var(--ink);font-weight:600}
+.steps li.cur span{background:var(--acc);border-color:var(--acc);color:var(--panel)}
+.steps li.cur.sd span{background:var(--teal);border-color:var(--teal)}
+.steps li.done span{background:var(--soft);color:var(--ink2)}
+.rrate{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;font-size:12px;color:var(--ink2)}
+.rrate b{font:600 13px var(--mono);color:var(--ink)} .rrate em{font-style:normal;color:var(--ink3);margin-left:4px}
+.rrate .tr{height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.rrate .fl{height:100%;background:var(--acc);transition:width .2s}
+.cover{padding:18px 20px;border-radius:10px;border-left:4px solid var(--pc);background:var(--soft)}
+.cover.cq,.eyebrow-p.cq{--pc:var(--acc)} .cover.cd,.eyebrow-p.cd{--pc:var(--teal)}
+.cover .cv-no{font:600 11.5px var(--mono);letter-spacing:.12em;color:var(--pc)}
+.cover h2{font-size:21px;margin:4px 0 8px}
+.cover p{margin:0 0 10px}
+.cv-list{list-style:none;padding:0;margin:0 0 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:4px 16px;font-size:13px}
+.cv-list li{display:flex;gap:8px;align-items:baseline}
+.cv-list b{font:600 12px var(--mono);color:var(--pc,var(--acc));min-width:14px}
+.eyebrow-p{font:600 11px var(--mono);letter-spacing:.1em;color:var(--pc);margin-bottom:2px}
+.blk{margin-top:14px}
+.blk h3.sub{font-size:14.5px;margin:0;padding:8px 12px;background:var(--soft);border-radius:6px;border-left:3px solid var(--acc);display:flex;justify-content:space-between;gap:10px}
+.blk h3.sub span{font-weight:400;font-size:12px;color:var(--ink3)}
+.blk h3+.q,.blk .lk-head+.q{border-top:none}
+#sv[data-part="d"] .blk h3.sub{border-left-color:var(--teal)}
+#sv[data-part="d"] .rrate .fl{background:var(--teal)}
+.lk-head{display:flex;justify-content:flex-end;gap:16px;font-size:11px;color:var(--ink3);margin:6px 0 -4px}
+.qnote{display:flex;gap:7px;align-items:flex-start;margin:-2px 0 9px;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.qnote .ic{flex:none;display:inline-grid;place-items:center;width:16px;height:16px;margin-top:1px;border-radius:50%;background:var(--accsoft);color:var(--acc);font:700 11px/1 Georgia,serif;font-style:italic}
+.letter{border:1px solid var(--line);border-radius:10px;padding:20px 22px;background:var(--panel)}
+.letter p{margin:0 0 10px;line-height:1.75}
+.letter .lt-title{font-size:13px;font-weight:600;color:var(--acc);letter-spacing:.02em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.letter .lt-sign{text-align:right;margin:16px 0 0;color:var(--ink2)}
+.letter .lt-sign b{color:var(--ink)}
+.overview{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.overview caption{text-align:left;font-weight:700;font-size:13.5px;padding:0 0 6px}
+.overview th,.overview td{border-top:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.overview tr:last-child th,.overview tr:last-child td{border-bottom:1px solid var(--line)}
+.overview th{width:92px;background:var(--soft);font-weight:600;color:var(--ink2);white-space:nowrap}
+.privacy{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--accsoft);font-size:12.5px}
+.privacy p{margin:4px 0 0;color:var(--ink2)}
+.sth{display:flex;align-items:center;gap:9px}
+.sth .stn{flex:none;display:inline-grid;place-items:center;min-width:26px;height:24px;padding:0 5px;border-radius:12px;background:var(--pc);color:var(--panel);font:700 13px var(--sans)}
+.sth.cq{--pc:var(--acc)} .sth.cd{--pc:var(--teal)}
+.blk>.q:first-child{border-top:none}
+.lead{margin:10px 0 4px;padding:12px 14px;border-radius:8px;background:var(--soft);border-left:3px solid var(--pc);font-size:13px}
+.lead.cq{--pc:var(--acc)} .lead.cd{--pc:var(--teal)}
+.lead p{margin:0;line-height:1.6}
+.lead .lead-list{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:6px;font-size:12px;color:var(--ink2)}
+.lead .lead-list b{font:600 11.5px var(--mono);color:var(--pc);margin-right:4px}
+.etc{display:block;width:100%;max-width:520px;margin-top:8px;padding:8px 10px;border:1px solid var(--acc2);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:13.5px}
+.etc:focus{outline:2px solid var(--acc);outline-offset:1px}
+.gift{margin:18px auto 0;max-width:460px;text-align:left;padding:14px 16px;border-radius:10px;background:var(--accsoft)}
+.gift p{margin:4px 0 10px;font-size:13px;color:var(--ink2)}
+.gift .btn{display:inline-block;text-decoration:none}
+.sv h2{font-size:17px;margin:0 0 4px}
+.q{padding:14px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none}
+.q .qt{font-weight:600;margin-bottom:8px;font-size:14px}
+.q .qt .no{font-family:var(--mono);color:var(--acc);margin-right:6px}
+.q .hint{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;background:var(--panel)}
+.opt input{accent-color:var(--acc);margin:0}
+.opt.on{border-color:var(--acc);background:var(--accsoft)}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:420px}
+.likert .opt{justify-content:center;padding:6px 0;font-family:var(--mono)}
+.lk-cap{display:flex;justify-content:space-between;max-width:420px;font-size:11px;color:var(--ink3);margin-top:3px}
+textarea{width:100%;min-height:64px;font:13px var(--sans);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:8px}
+.navb{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.err{color:var(--bad);font-size:12.5px;margin-top:8px;min-height:1em}
+.done{text-align:center;padding:30px 10px}
+.done .big{font:600 34px var(--mono);color:var(--acc)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13px;z-index:9}
+@media (max-width:560px){.wrap,.top .in{padding-inline:16px}.kpi .v{font-size:23px}.hbar{grid-template-columns:minmax(80px,42%) 1fr 46px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.links{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-top:6px}
+.lcard{display:flex;gap:14px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
+.lqr{width:104px;flex:0 0 104px}
+.lqr svg{width:100%;height:auto;display:block}
+.lbody{min-width:0;flex:1}
+.ltag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;margin-bottom:6px}
+.ltag.g1{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
+.ltag.g2{background:color-mix(in srgb,var(--hl) 15%,transparent);color:var(--hl)}
+.lmeta{font-size:12.5px;color:var(--ink2);margin:0 0 2px}
+.ldesc{font-size:12.5px;color:var(--ink3);margin:0 0 8px}
+.lurl code{display:block;font-family:var(--mono);font-size:12px;background:var(--bg2,rgba(127,127,127,.08));border-radius:6px;padding:6px 8px;overflow-wrap:anywhere}
+.lbtns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.opsh{font-size:13.5px;font-weight:600;margin:0 0 8px;color:var(--ink2)}
+.bd{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.bd.ok{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
+.bd.mid{background:color-mix(in srgb,var(--hl) 16%,transparent);color:var(--hl)}
+.bd.low{background:rgba(127,127,127,.15);color:var(--ink3)}
+.pager{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:10px}
+.conn{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.steps2{margin:0;padding-left:18px;font-size:13px;color:var(--ink2);line-height:1.75}
+.steps2 code{font-family:var(--mono);font-size:11.5px}
+#oTable td{white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+tr.tot td{border-top:1px solid var(--line);font-weight:600}
+.dfilt{display:flex;flex-direction:column;align-items:flex-end;gap:8px}.segs{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}.segs button{font:inherit;font-size:12.5px;padding:6px 13px;border:0;background:transparent;color:var(--ink2);cursor:pointer;white-space:nowrap}.segs button+button{border-left:1px solid var(--line)}.segs button.on{background:var(--acc);color:#fff;font-weight:600}.segs button:hover:not(.on){background:rgba(127,127,127,.08)}th.selcol,td.selcol{background:color-mix(in srgb,var(--acc) 8%,transparent)}@media (max-width:640px){.dfilt{align-items:flex-start}.segs button{padding:6px 10px;font-size:12px}}.mwrap[hidden]{display:none}.mwrap{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow:auto;z-index:20}.mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;max-width:660px;width:100%;box-shadow:0 18px 48px rgba(0,0,0,.18)}.mhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.mhead h2{margin:0;font-size:17px}.mfield{margin-top:14px}.mfield label{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:5px}.mfield textarea,.mfield input{width:100%;font:inherit;font-size:13px;line-height:1.7;color:var(--ink);background:var(--bg);font-family:var(--sans);border:1px solid var(--line);border-radius:9px;padding:10px 12px;resize:vertical}.mfield textarea{min-height:180px;white-space:pre-wrap}.mrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px}.mrow .muted{font-size:12px}</style>
+
+<header class="top"><div class="in">
+  <div class="brand">
+    <div class="eyebrow">동국대학교 서울앵커 평생교육 고도화 · 비전투커리어 · v6.2 (2026-10-07 설문 기준)</div>
+    <h1>DAQI_EL 교육품질·수요조사 대시보드</h1>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-dash" aria-selected="true" aria-controls="pane-dash">결과 대시보드</button>
+    <button class="tab" role="tab" id="tab-sv" aria-selected="false" aria-controls="pane-sv">설문 링크 · 응답 현황</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<div id="pane-dash" role="tabpanel" aria-labelledby="tab-dash">
+  <div class="notice"><span><b>집계 데이터</b> 응답 <span id="nTotal">0</span>건(G1. 교육 수강자 <span id="nG1">0</span>명 · G2. 잠재 학습자 <span id="nG2">0</span>명)<span id="nTail"> · 집계 데이터를 불러오는 중입니다.</span></span>
+    <label class="chk" for="cutLive"><input type="checkbox" id="cutLive"> 09:00 이후 응답도 포함 (실시간)</label>
+    <label class="btn" for="csv" hidden>CSV 불러오기<input type="file" id="csv" accept=".csv,text/csv" multiple hidden></label>
+    <button class="btn" id="reset" hidden></button></div>
+
+  <div class="bar">
+    <label for="fGrp">응답그룹 <select id="fGrp"><option value="">전체</option><option value="교육 수강자">G1. 교육 수강자</option><option value="잠재 학습자">G2. 잠재 학습자</option></select></label>
+    <label for="fType">성과유형 <select id="fType"><option value="">전체</option><option>A형</option><option>B형</option></select></label>
+    <label for="fCat">과정유형 <select id="fCat"><option value="">전체</option><option>AI·디지털</option><option>직업·직무</option><option>인문·교양</option><option>시민·웰니스</option></select></label>
+    <label for="fCourse">과정 <select id="fCourse"><option value="">전체 과정</option></select></label>
+    <label for="fW" class="chk"><input type="checkbox" id="fW"> 잠정 가중치 적용</label>
+    <span class="muted" style="font-size:12px" id="fInfo"></span>
+  </div>
+
+  <div class="dlayout">
+  <aside class="rail" aria-label="대시보드 목차">
+    <div class="rail-cap">목차</div>
+    <a href="#part-q" class="rp rp-q" data-t="part-q"><span class="rn">Ⅱ</span>교육 품질조사</a>
+    <a href="#s-areas" class="rs" data-t="s-areas">영역별 점수</a>
+    <a href="#s-matrix" class="rs" data-t="s-matrix">품질×수요 매트릭스</a>
+    <a href="#s-cat" class="rs" data-t="s-cat">유형별 비교</a>
+    <a href="#s-course" class="rs" data-t="s-course">과정별 결과</a>
+    <a href="#s-diag" class="rs" data-t="s-diag">문항 진단</a>
+    <a href="#part-e" class="rp rp-q" data-t="part-e"><span class="rn">Ⅲ</span>기존 과정 개선·개편</a>
+    <a href="#part-d" class="rp rp-d" data-t="part-d"><span class="rn">Ⅳ</span>2027년 교육 수요</a>
+    <a href="#s-s6" class="rs" data-t="s-s6">시민 필요역량</a>
+    <a href="#s-field" class="rs" data-t="s-field">분야별 참여의향</a>
+    <a href="#s-topics" class="rs" data-t="s-topics">분야별 희망 과정</a>
+    <a href="#s-q39" class="rs" data-t="s-q39">직업·직무 필요 요소</a>
+    <a href="#s-ops" class="rs" data-t="s-ops">운영방식 선호</a>
+    <a href="#part-p" class="rp rp-p" data-t="part-p"><span class="rn">Ⅴ</span>응답자 정보</a>
+  </aside>
+  <div class="dmain">
+  <nav class="toc" aria-label="섹션 바로가기"><span class="muted">바로가기</span><a href="#part-q" class="toc-q">Ⅱ. 교육 품질조사</a><a href="#part-e" class="toc-q">Ⅲ. 기존 과정 개선·개편</a><a href="#part-d" class="toc-d">Ⅳ. 2027년 교육 수요</a><a href="#part-p">Ⅴ. 응답자 정보</a></nav>
+
+  <section class="part part-q" id="part-q" aria-labelledby="h-q">
+    <header class="part-h"><div><div class="part-no">Ⅱ. 교육 품질조사 · G1. 교육 수강자</div><h2 id="h-q">DAQI_EL 교육품질 지수</h2></div><p>2~35번 · 5점 척도 34문항(앵커연계 S1~S5 포함) · 7개 영역 · <span id="wMode">가중치 미적용(영역 단순평균)</span></p></header>
+    <p class="note" id="gNoteQ" hidden>품질조사는 G1(교육 수강자)만 응답합니다. 응답그룹을 'G2. 잠재 학습자'로 고르면 이 파트는 비어 있습니다.</p>
+    <div class="grid kpis" id="kpis"></div>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card" id="s-areas"><h2>영역별 품질 점수</h2><p class="sub">영역점수 = 영역 평균 ÷ 5 × 100 · 괄호는 잠정 가중치(추후 확정)</p><div id="areas"></div></section>
+      <section class="card" id="s-matrix"><h2>품질 × 수요 매트릭스 <span class="muted" style="font-size:13px;font-weight:400">(G1 전용)</span></h2><p class="sub">세로 DAQI_EL(과정별) · 가로 38번 후속·심화과정 참여의향("매우 있다+있다") · 기준선 80점 / 60%</p><div id="matrix"></div></section>
+    </div>
+    <section class="card" id="s-cat" style="margin-top:16px"><h2>유형별 비교</h2><p class="sub">성과유형(A형·B형)을 먼저 보고, 과정유형 4분류로 나눠 봅니다 · AI·디지털(AI Starter) · 직업·직무(이커머스·여행업·D-커리어UP) · 인문·교양(인문교양) · 시민·웰니스(마음챙김)</p><div class="tablewrap"><table id="cattable"></table></div></section>
+    <section class="card" id="s-course" style="margin-top:16px"><h2>과정별 결과와 2027 개편유형(안)</h2>
+      <p class="sub">빨간 숫자 = 75점 미만 영역 · 개편유형(핵심경쟁·확장가능·우선개선·재구조화)은 기준값으로 자동 판정한 참고안이며 학사운영위원회 심의로 확정</p>
+      <div class="tablewrap"><table id="ctable"></table></div>
+      <p class="note">결과 제시 기준: 응답 10명 이상 → 과정별 지수·등급 / 5~9명 → 참고치(등급 미부여) / 5명 미만 → 유형 단위로 통합. 과정별 응답률을 미리 알 수 없어 유형(A/B) 분석을 우선 제시합니다. 전체 지수는 여행업 포함/제외 두 가지로 함께 제시합니다.</p>
+    </section>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card" id="s-diag"><h2>문항 진단: 유사문항 상관</h2><p class="sub">비슷해 보이는 문항끼리 응답이 얼마나 같이 움직였는지 (r ≥ 0.8이면 사실상 같은 질문)</p><div class="tablewrap"><table id="corr"></table></div></section>
+      <section class="card"><h2>문항 진단: 영역 신뢰도</h2><p class="sub">Cronbach α · 0.7 이상 양호 · 0.9 이상은 문항 중복 가능성</p><div class="tablewrap"><table id="alpha"></table></div></section>
+    </div>
+  </section>
+
+  <section class="part part-q" id="part-e" aria-labelledby="h-e">
+    <header class="part-h"><div><div class="part-no">Ⅲ. 기존 교육과정 개선·개편 수요 · G1. 교육 수강자</div><h2 id="h-e">참여 과정의 2027 개선 방향</h2></div><p>36~38번</p></header>
+    <div class="grid two">
+      <section class="card" id="s-q34"><h2>우선 개선사항</h2><p class="sub">37번 · 응답자 대비 선택 비율 (최대 3개)</p><div id="q34"></div></section>
+      <section class="card" id="s-q35"><h2>2027 운영 방향 · 후속과정 참여의향</h2><p class="sub">36번 운영 방향 · 38번 후속·심화과정 참여의향</p><div class="split" id="q3536" style="grid-template-columns:1fr"></div></section>
+    </div>
+  </section>
+
+  <section class="part part-d" id="part-d" aria-labelledby="h-d">
+    <header class="part-h"><div><div class="part-no">Ⅳ. 2027년 교육 수요 · <span id="dScope">G1 + G2 전체</span></div><h2 id="h-d">2027 교육 수요</h2></div><div class="dfilt"><p>39~46번(수요조사 설문 1~8번) · 시민 필요역량(S6), 분야별 희망 과정, 직업·직무 필요 요소, 신규 프로그램 제안, 운영방식 선호</p><div class="segs" id="dGrp" role="group" aria-label="수요조사 응답그룹"><button type="button" data-g="" class="on">전체</button><button type="button" data-g="교육 수강자">G1. 교육 수강자</button><button type="button" data-g="잠재 학습자">G2. 잠재 학습자</button></div></div></header><p class="note" id="dNote" hidden></p>
+    <div class="grid kpis" id="kpis2"></div>
+    <section class="card" id="s-s6" style="margin-top:16px"><h2>시민 필요역량 (S6)</h2><p class="sub">39번(수요조사 설문 1번) · 응답자 대비 선택 비율 (최대 2개)</p><div id="s6"></div></section>
+    <section class="card" id="s-field" style="margin-top:16px"><h2>분야별 참여의향</h2><p class="sub">40·41·43번에서 '관심 없음'을 고르지 않은 응답자 비율 · 응답그룹별 비교</p><div class="tablewrap"><table id="fieldtable"></table></div></section>
+    <section class="card" id="s-topics" style="margin-top:16px"><h2>분야별 희망 과정</h2><p class="sub">40·41·43번(수요조사 설문 2·3·5번) · 해당 문항 응답자 대비 선택 비율 (최대 3개) · 진한 막대 = 분야 내 1위</p><div class="split" id="topics"></div></section>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card" id="s-q39"><h2>직업·직무 교육에 필요한 요소</h2><p class="sub">42번(수요조사 설문 4번) · 41번에서 '관심 없음' 선택자는 제외 · 최대 3개</p><div id="q39"></div></section>
+      <section class="card" id="s-ops"><h2>교육운영 방식 선호</h2><p class="sub">45번 시간대 · 46번 운영 방식 (수요조사 설문 7·8번 · 둘 다 복수선택)</p><div class="split" id="ops" style="grid-template-columns:1fr"></div></section>
+    </div>
+    <section class="card" id="s-q41" style="margin-top:16px"><h2>2027 신규 프로그램 자유 제안</h2><p class="sub">44번(수요조사 설문 6번) · 주관식(선택 응답) · 같은 제안끼리 묶어 많이 나온 순 · 2회 이상 반복된 제안은 보고서에서 '잠재 수요 → 신규 후보'로 검토</p><div id="q41"></div></section>
+  </section>
+
+  <section class="part part-p" id="part-p" aria-labelledby="h-p">
+    <header class="part-h"><div><div class="part-no">Ⅴ. 응답자 정보 · <span id="pScope">G1 + G2 전체</span></div><h2 id="h-p">응답자 정보</h2></div><div class="dfilt"><p>47~49번(수요조사 설문 9~11번) · G1·G2 공통 · 1번 교육 참여 목적은 G1만</p><div class="segs" id="pGrp" role="group" aria-label="응답자 정보 응답그룹"><button type="button" data-g="" class="on">전체</button><button type="button" data-g="교육 수강자">G1. 교육 수강자</button><button type="button" data-g="잠재 학습자">G2. 잠재 학습자</button></div></div></header><p class="note" id="pNote" hidden></p>
+    <section class="card"><div class="split" id="demo"></div></section>
+  </section>
+  </div></div>
+</div>
+
+<div id="pane-sv" role="tabpanel" aria-labelledby="tab-sv" hidden>
+  <div class="notice"><span><b data-d="1">집계 데이터</b> 대상자별 설문 링크와 응답 현황입니다.<span id="nTail2"></span></span>
+    <label class="chk" for="cutLive2"><input type="checkbox" id="cutLive2"> 09:00 이후 응답도 포함 (실시간)</label>
+    <label class="btn" for="csv2" hidden>CSV 불러오기<input type="file" id="csv2" accept=".csv,text/csv" multiple hidden></label>
+    <button class="btn" id="reset2" hidden></button></div>
+
+  <section class="card"><h2>설문 링크</h2><p class="sub">G1. 교육 수강자는 과정별 링크(설문은 하나, 어느 과정 응답인지는 링크에 담긴 값으로 자동 기록) · G2. 잠재 학습자는 수요조사 링크 · 응답 파일은 설문별로 2개 · 조사기간 2026년 10월 7일 ~ 10월 18일</p>
+    <div class="links" id="links"></div>
+    <p class="note">QR은 인쇄물·현수막·문자 발송에 그대로 쓸 수 있습니다. 링크를 바꾸면 QR도 함께 바뀌므로, 배포 후에는 Tally에서 설문을 교체하지 말고 내용만 수정하십시오.</p>
+  </section>
+
+  <section class="card" style="margin-top:16px"><h2>현재 응답자 현황</h2><p class="sub" id="opsAsOf">불러온 응답 기준</p>
+    <div class="grid kpis" id="opsKpis"></div>
+    <div class="grid two" style="margin-top:16px">
+      <div><h3 class="opsh">일자별 응답</h3><div id="opsTrend"></div></div>
+      <div><h3 class="opsh">과정별 응답 수와 분석 기준</h3><div class="tablewrap"><table id="opsCourse"></table></div></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px"><h2>설문 방문 통계</h2><p class="sub" id="visitAsOf">방문 기록 기준</p>
+    <div id="visitBox"></div>
+    <p class="note">방문 수는 실시간이 아니며 Tally 방문통계 값(Insights → Visits)을 매일 1회(오전09:00) 업데이트합니다.<br>*조사 시작 전 테스트 방문수는 제외</p>
+  </section>
+
+  <section class="card" style="margin-top:16px"><h2>전체 응답 데이터</h2><p class="sub">응답 원자료입니다 · 성명·휴대전화번호는 들어 있지 않습니다</p>
+    <div class="bar" style="margin:0 0 12px">
+      <label for="oGrp">응답그룹 <select id="oGrp"><option value="">전체</option><option value="교육 수강자">G1. 교육 수강자</option><option value="잠재 학습자">G2. 잠재 학습자</option></select></label>
+      <label for="oCourse">과정 <select id="oCourse"><option value="">전체 과정</option></select></label>
+      <label for="oCols">표시 열 <select id="oCols"><option value="sum">요약</option><option value="all">전체 문항</option></select></label>
+      <label for="oQ">검색 <input type="search" id="oQ" placeholder="응답 내용 검색" style="width:150px"></label>
+      <button class="btn" id="oDown">CSV로 내보내기</button>
+      <span class="muted" style="font-size:12px" id="oInfo"></span>
+    </div>
+    <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="oTable"></table></div>
+    <div class="pager" id="oPager"></div>
+  </section>
+
+  <section class="card" style="margin-top:16px"><h2>데이터 갱신</h2><p class="sub">이 화면이 보여 주는 응답과 방문 기록</p>
+    <p class="note">이 화면은 열 때마다 최신 응답을 불러오고, 열어 두는 동안 10분마다 다시 불러옵니다. 설문에 응답이 들어온 뒤 여기에 보이기까지 몇 분쯤 걸릴 수 있습니다.</p>
+    <p class="note">기본 집계 기준은 <b>매일 오전 09:00</b>입니다. 위쪽의 <b>'09:00 이후 응답도 포함 (실시간)'</b>을 체크하면 지금까지 들어온 응답을 모두 보여 줍니다. 방문 수는 하루에 한 번(오전) 갱신됩니다.</p>
+    <p class="note">성명·휴대전화번호는 이 화면에 들어오지 않습니다.</p>
+    <p class="note" id="shMsg"></p>
+    <div hidden><input type="url" id="shUrl"><input type="url" id="shUrl2"><input type="url" id="shUrl3"><button id="shGo"></button><input type="checkbox" id="shAuto"></div>
+  </section>
+</div>
+
+<div class="mwrap" id="msgModal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="msgTitle">
+    <div class="mhead"><h2 id="msgTitle">설문 발송 문구</h2><button class="btn" id="msgClose" aria-label="닫기">닫기</button></div>
+    <div class="segs" id="msgTabs" role="group" aria-label="발송 수단">
+      <button type="button" data-t="sms" class="on">모바일 (문자·카카오톡)</button>
+      <button type="button" data-t="mail">이메일</button>
+    </div>
+    <p class="note" id="msgHint"></p>
+    <div id="msgBody"></div>
+  </div>
+</div>
+</main>
+
+<script>
+/* qrcode-generator 2.0.4 (MIT) */
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+<script>
+const META={"OPT":{"Q1":["취업","이직·경력전환","직무역량 향상","창업·부업","자격증","자기계발","문화·교양","건강·웰니스","사회참여"],"Q36":["현 수준 유지","일부 개선 후 재운영","내용·방식을 대폭 개편","심화과정으로 확장","신규 프로그램으로 전환","운영 축소 또는 폐지 검토"],"Q37":["교육내용의 최신화","실습·프로젝트 비중 확대","난이도 세분화(입문/중급/심화)","강사 전문성·현장경험 강화","기업·현장 연계 확대","취업·자격·경력개발 연계","교육시간·기간 조정","온라인·혼합수업 확대","교재·학습자료 개선","학습자 네트워킹·커뮤니티","후속·심화과정 연계","개선 필요사항 없음"],"Q38":["매우 있다","있다","보통이다","없다","전혀 없다"],"Q39":["디지털·AI 활용 역량","재취업·전직을 위한 직무역량","현재 직무의 전문성 향상","창업·부업 역량","은퇴 이후 삶의 설계","건강·마음 관리","인문·교양 소양","지역사회 참여·소통 역량"],"Q40":["생성형 AI 기초","AI업무자동화","AI에이전트","데이터분석·시각화","AI이미지·영상 제작","클라우드","관심 없음"],"Q41":["이커머스·온라인 판매","ESG경영(환경·사회·지배구조)","기업교육·HRD","피지컬AI·로봇","창업실무(사업계획·세무·마케팅)","관심 없음"],"Q42":["현장실습","기업 프로젝트","취업매칭","직무 포트폴리오","자격증","실무도구·시스템","산업체 강사","창업·부업 연계"],"Q43":["명상·마음챙김","불교문화","인문·철학","건강·웰니스","재무·자산관리","은퇴·라이프디자인","문화예술 체험","서울 역사·지역문화 탐방","관심 없음"],"Q45":["평일 오전","평일 오후","평일 저녁","토요일","일요일"],"Q46":["주 1회 (정기 운영)","주 2회 (정기 운영)","주말 집중 (토·일 집중 운영)","단기 집중 (평일 연속, 1~2주 내외)","프로젝트 기간형 (일정 기간 팀 과제 수행 중심)"],"Q47":["20대","30대","40대","50대","60대","70대 이상"],"Q48":["남성","여성","선택안함"],"Q49":["기업/기관 재직자","자영업·사업자","프리랜서","구직자","퇴직자","대학(원)생","전업주부"]},"OTHER":["Q1","Q37","Q39","Q40","Q41","Q42","Q43","Q49"],"MULTI":["Q37","Q39","Q40","Q41","Q42","Q43","Q45","Q46"],"SCALE":{"Q2":"교육과정의 목표가 명확하게 제시되었다.","Q3":"교육내용은 내가 기대했던 학습목적과 잘 맞았다.","Q4":"교육내용은 서울의 지역사회와 산업환경(일자리·산업구조 등)의 변화에 따른 수요를 잘 반영하였다.","Q5":"교육과정은 나와 같은 성인학습자(재직자·구직자·중장년·은퇴자 등)의 특성과 수요를 고려하여 구성되었다.","Q6":"교육내용은 체계적이고 논리적으로 구성되었다.","Q7":"교육내용은 해당 분야의 최신 내용을 적절히 반영하였다.","Q8":"교육내용은 이론과 실제가 적절하게 구성되었다.","Q9":"교육내용의 양은 전체 교육시간에 비해 적절하였다.","Q10":"교재·교육자료·콘텐츠는 학습에 도움이 되었다.","Q11":"교육과정의 난이도는 학습자의 수준에 적절하였다.","Q12":"교육내용은 대학의 전문성을 잘 반영하여 구성되었다.","Q13":"강사는 해당 분야에 충분한 전문지식과 경험을 갖추고 있었다.","Q14":"강사는 교육내용을 이해하기 쉽게 설명하였다.","Q15":"강사는 학습자의 질문과 의견에 적절하게 대응하였다.","Q16":"강사는 교육에 대한 열의와 성실성을 보여주었다.","Q17":"교육방법은 교육목적에 적절하였다.","Q18":"학습자가 직접 참여하거나 활동할 수 있는 기회가 충분하였다.","Q19":"교육내용을 이해하는 데 도움이 되는 사례나 활동이 적절히 활용되었다.","Q20":"학습과정에서 적절한 피드백을 받을 수 있었다.","Q21":"강의실과 교육시설은 학습하기에 적절하였다.","Q22":"교육에 필요한 기자재와 장비가 적절하게 제공되었다.","Q23":"교육일정과 시간대는 참여하기에 적절하였다.","Q24":"교육 신청 및 등록 절차가 편리하였다.","Q25":"교육과정 및 일정에 대한 안내가 충분하였다.","Q26":"대학 캠퍼스의 환경과 시설을 이용할 수 있어 유익했다.","Q27A":"교육을 통해 해당 분야의 지식이 향상되었다.","Q28A":"직무 수행에 필요한 기술이나 역량이 향상되었다.","Q29A":"배운 내용을 실제 업무 또는 경력개발에 활용할 수 있을 것 같다.","Q30A":"교육 이후 해당 분야를 계속 학습하고 싶은 의향이 높아졌다.","Q27B":"교육을 통해 새로운 지식과 관점을 얻었다.","Q28B":"교육이 삶의 만족이나 여가의 질을 높이는 데 도움이 되었다.","Q29B":"나 자신과 타인, 사회에 대한 이해가 높아졌다.","Q30B":"관련 문화·학습·사회활동에 계속 참여하고 싶은 의욕이 생겼다.","Q31":"전반적으로 본 교육과정에 만족한다.","Q32":"투자한 시간과 비용에 비해 교육의 가치가 높다고 생각한다.","Q33":"본 교육과정을 주변 사람에게 추천할 의향이 있다.","Q34":"향후 본 기관의 다른 교육과정에도 참여하고 싶다.","Q35":"앞으로도 서울 시민의 평생교육을 위해 대학의 역할이 더 강화되어야 한다고 생각한다."},"NUM":{"Q2":"2","Q3":"3","Q4":"4","Q5":"5","Q6":"6","Q7":"7","Q8":"8","Q9":"9","Q10":"10","Q11":"11","Q12":"12","Q13":"13","Q14":"14","Q15":"15","Q16":"16","Q17":"17","Q18":"18","Q19":"19","Q20":"20","Q21":"21","Q22":"22","Q23":"23","Q24":"24","Q25":"25","Q26":"26","Q27A":"27-A","Q28A":"28-A","Q29A":"29-A","Q30A":"30-A","Q27B":"27-B","Q28B":"28-B","Q29B":"29-B","Q30B":"30-B","Q31":"31","Q32":"32","Q33":"33","Q34":"34","Q35":"35","Q1":"1","Q36":"36","Q37":"37","Q38":"38","Q39":"39","Q40":"40","Q41":"41","Q42":"42","Q43":"43","Q44":"44","Q45":"45","Q46":"46","Q47":"47","Q48":"48","Q49":"49"},"DNUM":{"Q39":1,"Q40":2,"Q41":3,"Q42":4,"Q43":5,"Q44":6,"Q45":7,"Q46":8,"Q47":9,"Q48":10,"Q49":11},"TITLE":{"Q1":"해당 교육에 참여한 주된 목적은 무엇이었습니까?","Q36":"참여하신 교육과정의 2027년 운영 방향으로 가장 적절하다고 생각하는 것은 무엇입니까?","Q37":"참여하셨던 교육과정을 개선해야 한다면 어떤 사항을 우선적으로 개선해야 할까요? (최대 3개)","Q38":"참여하신 교육과정과 연계된 후속·심화과정이 개설된다면 참여할 의향이 있습니까?","Q39":"서울에서 일하고 생활하는 시민으로서, 앞으로 가장 필요하다고 느끼는 역량은 무엇입니까? (최대 2개)","Q40":"2027년에 「AI·디지털」 교육이 열린다면, 참여하고 싶은 과정을 골라 주십시오. (최대 3개)","Q41":"2027년에 「직업·직무」 교육이 열린다면, 참여하고 싶은 과정을 골라 주십시오. (최대 3개)","Q42":"「직업·직무」 교육에서 중요하게 생각하는 요소는 무엇입니까? (최대 3개)","Q43":"2027년에 「문화·시민·웰니스」 교육이 열린다면, 참여하고 싶은 과정을 골라 주십시오. (최대 3개)","Q44":"2027년에 새롭게 개설되거나 확대되기를 바라는 교육과정이 있다면 자유롭게 제안해 주십시오. (선택 응답)","Q45":"선호하는 교육시간대는 언제입니까? (복수선택 가능)","Q46":"선호하시는 교육 운영 방식은 무엇입니까? (복수선택 가능)","Q47":"연령대","Q48":"성별","Q49":"신분"},"AREAS":[["A","교육목표·수요 적합성",0.1,["Q2","Q3","Q4","Q5"]],["B","교육내용 품질",0.2,["Q6","Q7","Q8","Q9","Q10","Q11","Q12"]],["C","교수자 품질",0.2,["Q13","Q14","Q15","Q16"]],["D","교수·학습방법",0.15,["Q17","Q18","Q19","Q20"]],["E","교육환경·운영서비스",0.15,["Q21","Q22","Q23","Q24","Q25","Q26"]],["F","교육성과",0.15,[]],["G","종합만족·지속참여",0.05,["Q31","Q32","Q33","Q34","Q35"]]],"FA":["Q27A","Q28A","Q29A","Q30A"],"FB":["Q27B","Q28B","Q29B","Q30B"],"COURSES":[["ai-starter","AI Starter Program","A형","AI·디지털",0],["njob-ecommerce","N잡러 이커머스 창업실전캠프","A형","직업·직무",0],["travel-operator","여행업 오퍼레이터 양성과정","A형","직업·직무",1],["dcareer-mentoring","D-커리어UP 멘토링","A형","직업·직무",0],["humanities","인문교양","B형","인문·교양",0],["mindfulness","마음챙김 프로그램","B형","시민·웰니스",0]],"CATS":["AI·디지털","직업·직무","인문·교양","시민·웰니스"],"PAT":{"main":{"Q1":["1. 해당 교육에 참여한 주된 목적은",""],"Q2":["2. 교육과정의 목표가 명확하게 제시",""],"Q3":["3. 교육내용은 내가 기대했던 학습목",""],"Q4":["4. 교육내용은 서울의 지역사회와 산",""],"Q5":["5. 교육과정은 나와 같은 성인학습자",""],"Q6":["6. 교육내용은 체계적이고 논리적으로",""],"Q7":["7. 교육내용은 해당 분야의 최신 내",""],"Q8":["8. 교육내용은 이론과 실제",""],"Q9":["9. 교육내용의 양은 전체 교육시간에",""],"Q10":["10. 교재·교육자료·콘텐츠는 학습에",""],"Q11":["11. 교육과정의 난이도는 학습자의",""],"Q12":["12. 교육내용은 대학의 전문성을 잘",""],"Q13":["13. 강사는 해당 분야에 충분한 전",""],"Q14":["14. 강사는 교육내용을 이해하기 쉽",""],"Q15":["15. 강사는 학습자의 질문과 의견에",""],"Q16":["16. 강사는 교육에 대한 열의와 성",""],"Q17":["17. ","교육목적에 적절하였다."],"Q18":["18. 학습자가 직접 참여하거나 활동",""],"Q19":["19. ",""],"Q20":["20. 학습과정에서 적절한 피드백을",""],"Q21":["21. 강의실과 교육시설은 학습하기에",""],"Q22":["22. 교육에 필요한 기자재와 장비가",""],"Q23":["23. 교육일정과 시간대는 참여하기에",""],"Q24":["24. 교육 신청 및 등록 절차가 편",""],"Q25":["25. 교육과정 및 일정에 대한 안내",""],"Q26":["26. 대학 캠퍼스의 환경과 시설을",""],"Q27A":["27. 교육을 통해 해당 분야의 지식",""],"Q28A":["28. 직무 수행에 필요한 기술이나",""],"Q29A":["29. 배운 내용을 실제 업무 또는",""],"Q30A":["30. 교육 이후 해당 분야를 계속",""],"Q27B":["27. 교육을 통해 새로운 지식과 관",""],"Q28B":["28. 교육이 삶의 만족이나 여가의",""],"Q29B":["29. 나 자신과 타인, 사회에 대한",""],"Q30B":["30. 관련 문화·학습·사회활동에 계",""],"Q31":["31. 전반적으로 본 교육과정에 만족",""],"Q32":["32. 투자한 시간과 비용에 비해 교",""],"Q33":["33. 본 교육과정을 주변 사람에게",""],"Q34":["34. 향후 본 기관의 다른 교육과정",""],"Q35":["35. 앞으로도 서울 시민의 평생교육",""],"Q36":["36. 참여하신 교육과정의 2027년",""],"Q37":["37. 참여하셨던 교육과정을 개선해야","(최대 3개)"],"Q38":["38. 참여하신 교육과정과 연계된 후",""],"Q39":["39. 서울에서 일하고 생활하는 시민","(최대 2개)"],"Q40":["40. 2027년에 「AI·디지털」","(최대 3개)"],"Q41":["41. 2027년에 「직업·직무」 교","(최대 3개)"],"Q42":["42. 「직업·직무」 교육에서 중요하","(최대 3개)"],"Q43":["43. 2027년에 「문화·시민·웰니","(최대 3개)"],"Q44":["44. 2027년에 새롭게 개설되거나",""],"Q45":["45. 선호하는 교육시간대는 언제입니","(복수선택 가능)"],"Q46":["46. 선호하시는 교육 운영 방식은","(복수선택 가능)"],"Q47":["47. 연령대",""],"Q48":["48. 성별",""],"Q49":["49. 신분",""],"과정선택":["참여하신 교육과정명을 선택해",""],"과정명입력":["참여하신 교육과정명을 입력해",""],"과정성격":["참여하신 교육과정의 성격에",""],"답례품응모":["개인정보 수집·이용에 동의하고",""]},"dem":{"Q39":["1. 서울에서 일하고 생활하는 시민으","(최대 2개)"],"Q40":["2. 2027년에 「AI·디지털」 교","(최대 3개)"],"Q41":["3. 2027년에 「직업·직무」 교육","(최대 3개)"],"Q42":["4. 「직업·직무」 교육에서 중요하게","(최대 3개)"],"Q43":["5. 2027년에 「문화·시민·웰니스","(최대 3개)"],"Q44":["6. 2027년에 새롭게 개설되거나",""],"Q45":["7. 선호하는 교육시간대는 언제입니까","(복수선택 가능)"],"Q46":["8. 선호하시는 교육 운영 방식은 무","(복수선택 가능)"],"Q47":["9. 연령대",""],"Q48":["10. 성별",""],"Q49":["11. 신분",""],"답례품응모":["개인정보 수집·이용에 동의하고",""]}},"URL":{"main":"https://tally.so/r/rjX47N","dem":"https://tally.so/r/817DPz"}};
+const SAMPLE={"cols":["응답ID","응답일","그룹","설문","과정코드","유형코드","과정명","과정선택","과정명입력","과정성격","Q1","Q2","Q3","Q4","Q5","Q6","Q7","Q8","Q9","Q10","Q11","Q12","Q13","Q14","Q15","Q16","Q17","Q18","Q19","Q20","Q21","Q22","Q23","Q24","Q25","Q26","Q27A","Q28A","Q29A","Q30A","Q27B","Q28B","Q29B","Q30B","Q31","Q32","Q33","Q34","Q35","Q36","Q37","Q38","Q39","Q40","Q41","Q42","Q43","Q44","Q45","Q46","Q47","Q48","Q49","답례품응모","성과유형","과정분류"],"rows":[]};
+const SAMPLE_VISITS=[];
+const AREAS=META.AREAS.map(a=>({k:a[0],n:a[1],w:a[2],q:a[3]}));
+const BASE_COURSES=META.COURSES.map(c=>({code:c[0],n:c[1],t:c[2],cat:c[3],excl:!!c[4]}));
+let COURSES=BASE_COURSES.slice();
+const TH={S:90,A:85,B:80,C:75,Q:80,D:0.6,MIN:10,REF:5};
+const G1='교육 수강자',G2='잠재 학습자',NONE='관심 없음',NOCOURSE='참여한 과정 없음';
+const GL1='G1. 교육 수강자',GL2='G2. 잠재 학습자',gl=v=>v===G1?GL1:v===G2?GL2:v;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let DATA=[];
+// 그룹·과정명·성과유형·과정분류가 비어 있으면 산출계산시트 [응답데이터]와 같은 규칙으로 채움
+function derive(o){
+  const sel=o['과정선택']||'';
+  if(!o['그룹'])o['그룹']=(o['설문']==='수요조사'||sel===NOCOURSE)?G2:G1;
+  if(o['그룹']!==G1)return o;
+  const cd=o['과정코드']||'';
+  if(!o['과정명']){const c=BASE_COURSES.find(x=>x.code===cd);o['과정명']=cd?(c?c.n:cd):sel;}
+  const c=BASE_COURSES.find(x=>x.n===o['과정명']),tc=(o['유형코드']||'').toUpperCase();
+  if(!o['성과유형'])o['성과유형']=tc==='A'?'A형':tc==='B'?'B형':sel==='기타'?(o['과정성격']?(o['과정성격'].startsWith('직업')?'A형':'B형'):''):c?c.t:'미분류';
+  if(!o['과정분류'])o['과정분류']=o['과정명']?(c?c.cat:'기타'):'';
+  return o;}
+function loadObjs(objs){DATA=objs.map(derive);
+  COURSES=BASE_COURSES.slice();
+  DATA.forEach(r=>{const n=r['과정명'];if(r['그룹']===G1&&n&&n!=='기타'&&!COURSES.some(c=>c.n===n))COURSES.push({code:r['과정코드']||'',n,t:typeOf(r),cat:catOf(r),excl:false});});
+  fillCourseFilter();fillCourseSel();refresh();}
+function load(cols,rows){loadObjs(rows.map(r=>{const o={};cols.forEach((c,i)=>{if(c)o[c]=r[i]==null?'':String(r[i]).trim();});return o;}));}
+function courseOf(r){return COURSES.find(x=>x.n===r['과정명']);}
+function typeOf(r){const t=r['성과유형']||'';return t==='A형'||t==='B형'?t:'';}
+function catOf(r){return r['과정분류']||'';}
+// 복수선택: 한 칸에 이어진 값에서 보기 문구 포함 여부로 판정 · 기타 = 보기 외에 직접 입력한 내용
+function has(v,o){return !!v&&v.includes(o);}
+function otherOf(q,v){if(!v)return'';const opts=META.OPT[q]||[];
+  if(META.MULTI.includes(q)){let s=v;[...opts].sort((a,b)=>b.length-a.length).forEach(o=>{s=s.split(o).join('');});return s.replace(/[,;]/g,' ').trim();}
+  return opts.includes(v)?'':v;}
+function avg(a){a=a.filter(v=>v!==''&&v!=null&&!isNaN(v)).map(Number);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null;}
+function areaAvg(r,a){const qs=a.k==='F'?META.FA.concat(META.FB):a.q;return avg(qs.map(q=>r[q]));}
+function grade(x){return x==null?'':x>=TH.S?'S':x>=TH.A?'A':x>=TH.B?'B':x>=TH.C?'C':'D';}
+const useW=()=>$('#fW').checked;
+let dGrpV='',pGrpV='';
+function daqi(rs){const sc=AREAS.map(a=>{const v=avg(rs.map(r=>areaAvg(r,a)).filter(v=>v!=null));return v==null?null:v/5*100;});
+  if(sc.some(v=>v==null))return{sc,d:null};return{sc,d:useW()?sc.reduce((s,v,i)=>s+v*AREAS[i].w,0):sc.reduce((s,v)=>s+v,0)/sc.length};}
+function pos36(rs){const a=rs.filter(r=>r.Q38);return a.length?a.filter(r=>r.Q38==='매우 있다'||r.Q38==='있다').length/a.length:null;}
+function count(rs,q,opts,multi){const base=rs.filter(r=>r[q]).length;
+  const items=opts.map(o=>{const n=rs.filter(r=>multi?has(r[q],o):r[q]===o).length;return{o,n,p:base?n/base:0};});
+  if(META.OTHER.includes(q)){const n=rs.filter(r=>otherOf(q,r[q])).length;items.push({o:'기타',n,p:base?n/base:0});}
+  return{base,items};}
+function interest(rs,q){const a=rs.filter(r=>r[q]);return a.length?a.filter(r=>!has(r[q],NONE)).length/a.length:null;}
+function kind(d,p){if(d==null)return'';if(p==null)return'수요 미조사';return d>=TH.Q?(p>=TH.D?'핵심경쟁':'확장가능'):(p>=TH.D?'우선개선':'재구조화');}
+const f1=v=>v==null?'–':v.toFixed(1), pc=v=>v==null?'–':Math.round(v*100)+'%';
+function hbars(el,items,{max=null,fmt=pc,top=null,limit=99}={}){
+  items=items.slice(0,limit);const m=max||Math.max(...items.map(i=>i.v),0.0001);
+  el.innerHTML='<div class="hbar">'+items.map(i=>`<div class="nm">${esc(i.label)}</div><div class="tr"><div class="fl${top&&top===i.label?' top':''}" style="width:${Math.max(0,Math.min(100,i.v/m*100))}%"></div></div><div class="vl">${fmt(i.v)}</div>`).join('')+'</div>';}
+const byGrp=(rs,g)=>g?rs.filter(r=>r['그룹']===g):rs;
+function courseFilter(r){const t=$('#fType').value,g=$('#fCat').value,c=$('#fCourse').value;return (!t||typeOf(r)===t)&&(!g||catOf(r)===g)&&(!c||r['과정명']===c);}
+function filtered(){const g=$('#fGrp').value,anyCourse=$('#fType').value||$('#fCat').value||$('#fCourse').value;
+  return DATA.filter(r=>(!g||r['그룹']===g)&&(!anyCourse||(r['그룹']===G1&&courseFilter(r))));}
+
+function refresh(){
+  const nG1=DATA.filter(r=>r['그룹']===G1).length;
+  $('#nTotal').textContent=DATA.length;$('#nG1').textContent=nG1;$('#nG2').textContent=DATA.length-nG1;
+  $('#wMode').textContent=useW()?'잠정 가중치 적용 (A10·B20·C20·D15·E15·F15·G5%)':'가중치 미적용(영역 단순평균) · 가중치 추후 확정';
+  const rs=filtered(), p1=rs.filter(r=>r['그룹']===G1);
+  $('#fInfo').textContent=`표시 중: 응답 ${rs.length}건 (G1 ${p1.length}명 · G2 ${rs.length-p1.length}명)`;
+  $('#gNoteQ').hidden=!!p1.length;
+  const kpi=k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${k[2]}</div></div>`;
+  // ---------- Ⅱ 품질 ----------
+  const all=daqi(p1), op=daqi(p1.filter(r=>!(courseOf(r)||{}).excl));
+  const minI=all.sc.every(v=>v!=null)?all.sc.indexOf(Math.min(...all.sc)):-1;
+  $('#kpis').innerHTML=[
+    ['응답 수 (G1. 교육 수강자)',p1.length+'<small>건</small>',`과정 ${new Set(p1.map(r=>r['과정명']).filter(Boolean)).size}개`],
+    ['DAQI_EL 종합',f1(all.d)+`<small>${grade(all.d)}등급</small>`,'여행업 포함'],
+    ['DAQI_EL (여행업 제외)',f1(op.d)+`<small>${grade(op.d)}등급</small>`,'2027 개편 대상 외 과정 제외'],
+    ['가장 낮은 영역',minI<0?'–':AREAS[minI].k+`<small>${AREAS[minI].n}</small>`,minI<0?'':f1(all.sc[minI])+'점']
+  ].map(kpi).join('');
+  { const W=560,rowH=34,H=AREAS.length*rowH+26,x0=215,x1=W-44,sx=v=>x0+(v-50)/50*(x1-x0);
+    let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="영역별 품질 점수">`;
+    [50,60,70,80,90,100].forEach(t=>{s+=`<line x1="${sx(t)}" x2="${sx(t)}" y1="0" y2="${H-20}" stroke="var(--line)"/><text x="${sx(t)}" y="${H-5}" font-size="10.5" text-anchor="middle" style="fill:var(--ink3)">${t}</text>`;});
+    s+=`<line x1="${sx(TH.Q)}" x2="${sx(TH.Q)}" y1="0" y2="${H-20}" stroke="var(--hl)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    AREAS.forEach((a,i)=>{const v=all.sc[i],y=i*rowH+6,weak=i===minI,nq=a.k==='F'?META.FA.length:a.q.length;
+      s+=`<text x="0" y="${y+15}" font-size="12.5" style="fill:var(--ink);font-weight:600">${a.k}</text><text x="16" y="${y+15}" font-size="12">${a.n} (${nq}문항·${Math.round(a.w*100)}%)</text>`;
+      if(v!=null){const vv=Math.max(50,Math.min(100,v));
+        s+=`<rect x="${x0}" y="${y+3}" width="${Math.max(0,sx(vv)-x0)}" height="16" rx="3" style="fill:${weak?'var(--hl)':'var(--acc)'}" opacity="${weak?1:.85}"/>`;
+        s+=`<text x="${sx(vv)+6}" y="${y+15.5}" font-size="12" style="font-family:var(--mono);fill:${weak?'var(--hl)':'var(--ink)'};font-weight:${weak?600:400}">${v.toFixed(1)}</text>`;}});
+    $('#areas').innerHTML=s+'</svg>'+`<div class="legend"><span><svg width="16" height="4" style="vertical-align:middle"><line x1="0" x2="16" y1="2" y2="2" stroke="var(--hl)" stroke-dasharray="3 3" stroke-width="2"/></svg> 품질 기준 ${TH.Q}점</span><span><svg width="10" height="10" style="vertical-align:middle"><rect width="10" height="10" rx="2" style="fill:var(--hl)"/></svg> 가장 취약한 영역${minI<0?'':` (${AREAS[minI].k} ${f1(all.sc[minI])}점)`}</span></div>`; }
+  const T=$('#fType').value,Gc=$('#fCat').value;
+  const P1=DATA.filter(r=>r['그룹']===G1);
+  const crs=COURSES.filter(c=>(!T||c.t===T)&&(!Gc||c.cat===Gc)).map(c=>{const r=P1.filter(x=>x['과정명']===c.n);const q=daqi(r);const p=pos36(r);return{...c,n_:r.length,...q,p,k:kind(q.d,p)};}).filter(c=>c.n_>0);
+  const hd=`<tr><th class="l">구분</th><th>유형</th><th>응답</th>${AREAS.map(a=>`<th>${a.k}</th>`).join('')}<th>DAQI_EL</th><th>등급</th><th>취약영역</th><th>참여의향</th><th>개편유형(안)</th><th class="l">비고</th></tr>`;
+  const row=(nm,t,n,sc,d,p,k,note,bold)=>{const lvl=bold?'full':n>=TH.MIN?'full':n>=TH.REF?'ref':'merge';
+    if(lvl==='merge')return `<tr class="r-merge"><td class="l">${esc(nm)}</td><td>${t}</td><td class="num">${n}</td><td colspan="${AREAS.length+5}" class="l muted">응답 ${TH.REF}명 미만 · 익명성 보호를 위해 유형 단위로 통합 분석</td><td class="l muted">${note}</td></tr>`;
+    const ref=lvl==='ref';
+    return `<tr${bold?' style="font-weight:600;background:var(--soft)"':ref?' class="r-ref"':''}><td class="l">${esc(nm)}</td><td>${t}</td><td class="num">${n}</td>${sc.map(v=>`<td class="num${v!=null&&v<75&&!ref?' low':''}">${f1(v)}</td>`).join('')}<td class="num"><b>${f1(d)}</b></td><td>${d==null?'':ref?'<span class="muted" style="font-size:11.5px">참고치</span>':`<span class="pill g-${grade(d)}">${grade(d)}</span>`}</td><td>${(()=>{if(d==null)return'';const m=Math.min(...sc);return AREAS[sc.indexOf(m)].k+' ('+m.toFixed(1)+')';})()}</td><td class="num">${pc(p)}</td><td>${k&&!ref?`<span class="chip t-${k.replace(' ','')}">${k}</span>`:k?`<span class="muted" style="font-size:11.5px">${k}(참고)</span>`:''}</td><td class="l muted">${note}</td></tr>`;};
+  const allR=P1.filter(x=>(!T||typeOf(x)===T)&&(!Gc||catOf(x)===Gc)), opR=allR.filter(r=>!(courseOf(r)||{}).excl);
+  const A_=daqi(allR),O_=daqi(opR);
+  $('#ctable').innerHTML=hd.replace('구분','과정명')+crs.map(c=>row(c.n,c.t,c.n_,c.sc,c.d,c.p,c.k,[c.n_>=TH.REF&&c.n_<TH.MIN?`응답 ${TH.REF}~${TH.MIN-1}명: 참고치(등급 미부여)`:'',c.excl?'2027 개편 대상 제외':''].filter(Boolean).join(' · '))).join('')
+    +row('전체','–',allR.length,A_.sc,A_.d,pos36(allR),'','',true)+row('전체 (여행업 제외)','–',opR.length,O_.sc,O_.d,pos36(opR),'','',true);
+  { const tt=['A형','B형'].map(t=>{const r=P1.filter(x=>typeOf(x)===t);if(!r.length)return'';const q=daqi(r),pp=pos36(r);return row(t==='A형'?'A형 (직업·직무·AI·자격)':'B형 (문화·인문·시민·웰니스)',t,r.length,q.sc,q.d,pp,kind(q.d,pp),'성과유형',true);}).join('');
+    const cats=['AI·디지털','직업·직무','인문·교양','시민·웰니스'];
+    const cc=cats.map(g=>{const r=P1.filter(x=>catOf(x)===g&&(!T||typeOf(x)===T));if(!r.length)return'';const q=daqi(r),pp=pos36(r);return row(g,[...new Set(r.map(typeOf))].join('·'),r.length,q.sc,q.d,pp,kind(q.d,pp),new Set(r.map(x=>x['과정명'])).size+'개 과정');}).join('');
+    $('#cattable').innerHTML=hd+tt+cc; }
+  // matrix
+  { const W=520,H=330,l=44,r=16,t=12,b=36,xs=p=>l+p*(W-l-r),ys=d=>t+(95-d)/35*(H-t-b);
+    const X=xs(TH.D),Y=ys(TH.Q);
+    let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="품질 수요 매트릭스">`;
+    s+=`<rect x="${X}" y="${t}" width="${W-r-X}" height="${Y-t}" style="fill:var(--goodsoft)"/><rect x="${l}" y="${t}" width="${X-l}" height="${Y-t}" style="fill:var(--accsoft)"/><rect x="${X}" y="${Y}" width="${W-r-X}" height="${H-b-Y}" style="fill:var(--warnsoft)"/><rect x="${l}" y="${Y}" width="${X-l}" height="${H-b-Y}" style="fill:var(--badsoft)"/>`;
+    s+=`<text x="${W-r-6}" y="${t+15}" font-size="11.5" text-anchor="end" style="fill:var(--good);font-weight:600">핵심경쟁</text><text x="${l+6}" y="${t+15}" font-size="11.5" style="fill:var(--acc);font-weight:600">확장가능</text><text x="${W-r-6}" y="${H-b-8}" font-size="11.5" text-anchor="end" style="fill:var(--warn);font-weight:600">우선개선</text><text x="${l+6}" y="${H-b-8}" font-size="11.5" style="fill:var(--bad);font-weight:600">재구조화</text>`;
+    [60,70,80,90].forEach(v=>s+=`<text x="${l-6}" y="${ys(v)+4}" font-size="10.5" text-anchor="end" style="fill:var(--ink3)">${v}</text>`);
+    [0,.2,.4,.6,.8,1].forEach(v=>s+=`<text x="${xs(v)}" y="${H-b+15}" font-size="10.5" text-anchor="middle" style="fill:var(--ink3)">${Math.round(v*100)}%</text>`);
+    s+=`<text x="${(l+W-r)/2}" y="${H-4}" font-size="11" text-anchor="middle">후속·심화과정 참여의향 →</text>`;
+    const pts=crs.filter(c=>c.d!=null&&c.p!=null&&c.n_>=TH.REF).map(c=>{
+      const cx=xs(Math.max(0,Math.min(1,c.p))),cy=ys(Math.max(60,Math.min(95,c.d))),rad=3+Math.sqrt(c.n_)*0.7;
+      const label=c.n.replace('AI Starter Program','AI Starter').replace(' 창업실전캠프','').replace(' 양성과정','').replace(' 교육과정','').replace(' 프로그램','');
+      return {cx,cy,rad,label,ref:c.n_<TH.MIN};}).sort((a,b)=>a.cy-b.cy);
+    const tw=t=>[...t].reduce((w,ch)=>w+(/[가-힣]/.test(ch)?11:6.3),0), boxes=[];
+    const hit=bx=>boxes.some(q=>bx.x<q.x+q.w&&bx.x+bx.w>q.x&&bx.y<q.y+q.h&&bx.y+bx.h>q.y)||pts.some(o=>o.cx+o.rad>bx.x&&o.cx-o.rad<bx.x+bx.w&&o.cy+o.rad>bx.y&&o.cy-o.rad<bx.y+bx.h);
+    pts.forEach(p=>{const w=tw(p.label);let pick=null;
+      for(const dy of [0,-14,14,-28,28,42])for(const an of ['start','end']){if(pick)break;const lx=an==='start'?p.cx+p.rad+5:p.cx-p.rad-5,ly=p.cy+4+dy,bx={x:an==='start'?lx:lx-w,y:ly-11,w,h:14};if(bx.x<l||bx.x+w>W-r)continue;if(!hit(bx))pick={lx,ly,an,bx};}
+      if(!pick){const lx=p.cx+p.rad+5;pick={lx,ly:p.cy+4,an:'start',bx:{x:lx,y:p.cy-7,w,h:14}};}
+      Object.assign(p,{lx:pick.lx,ly:pick.ly,anchor:pick.an});boxes.push(pick.bx);});
+    pts.forEach(p=>{s+=`<circle cx="${p.cx}" cy="${p.cy}" r="${p.rad}" style="fill:var(--panel);stroke:var(--ink)" stroke-width="1.5"${p.ref?' stroke-dasharray="3 2"':''}/>`;});
+    pts.forEach(p=>{if(Math.abs(p.ly-(p.cy+4))>2)s+=`<line x1="${p.cx}" y1="${p.cy}" x2="${p.lx}" y2="${p.ly-4}" style="stroke:var(--ink3)" stroke-width="1"/>`;
+      s+=`<text x="${p.lx}" y="${p.ly}" font-size="11" text-anchor="${p.anchor}" paint-order="stroke" stroke-width="3" style="fill:var(--ink);stroke:var(--panel)">${esc(p.label)}</text>`;});
+    $('#matrix').innerHTML=s+'</svg>'+`<p class="note">G1. 교육 수강자 기준 · 기준선: 품질 ${TH.Q}점 · 참여의향 ${Math.round(TH.D*100)}% · 원 크기 = 응답 수 · 점선 원 = 응답 ${TH.REF}~${TH.MIN-1}명(참고치) · ${TH.REF}명 미만 과정은 표시 안 함</p>`; }
+  // diagnostics
+  const pairs=[['Q4','Q7','지역·산업환경 변화 수요 / 최신 내용',1],['Q8','Q19','이론·실제 구성 / 사례·활동 활용',1],['Q16','Q13','강사 열의 / 전문성',0],['Q16','Q14','강사 열의 / 설명력',0],['Q32','Q31','교육 가치 / 종합 만족',0]];
+  const corr=(a,b)=>{const p=p1.filter(r=>r[a]!==''&&r[b]!=='').map(r=>[+r[a],+r[b]]);if(p.length<3)return null;const ma=p.reduce((s,x)=>s+x[0],0)/p.length,mb=p.reduce((s,x)=>s+x[1],0)/p.length;let n=0,da=0,db=0;p.forEach(([x,y])=>{n+=(x-ma)*(y-mb);da+=(x-ma)**2;db+=(y-mb)**2;});return da&&db?n/Math.sqrt(da*db):null;};
+  $('#corr').innerHTML='<tr><th>문항</th><th class="l">내용</th><th>r</th><th class="l">해석</th></tr>'+pairs.map(([a,b,w,main])=>{const r=corr(a,b);const it=r==null?'':r>=.8?'<span class="chip t-우선개선">통합 검토 가능</span>':r>=.6?'<span class="chip t-확장가능">관련 높음 · 유지</span>':'<span class="chip t-핵심경쟁">별개 개념 · 유지</span>';return`<tr><td class="num">${a.slice(1)}·${b.slice(1)}</td><td class="l">${main?'':'<span class="muted">(참고)</span> '}${w}</td><td class="num"><b>${r==null?'–':r.toFixed(2)}</b></td><td class="l">${it}</td></tr>`;}).join('');
+  const variance=a=>{const m=a.reduce((s,x)=>s+x,0)/a.length;return a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1);};
+  const alphaRows=AREAS.flatMap(a=>a.k==='F'?[['FA','교육성과 A형',META.FA],['FB','교육성과 B형',META.FB]]:[[a.k,a.n,a.q]]).map(([k,n,qs])=>{
+    const full=p1.filter(r=>qs.every(q=>r[q]!==''));if(full.length<3)return[k,n,qs.length,full.length,null];
+    const iv=qs.reduce((s,q)=>s+variance(full.map(r=>+r[q])),0),tv=variance(full.map(r=>qs.reduce((s,q)=>s+ +r[q],0)));
+    return[k,n,qs.length,full.length,tv?qs.length/(qs.length-1)*(1-iv/tv):null];});
+  $('#alpha').innerHTML='<tr><th>영역</th><th class="l">영역명</th><th>문항</th><th>응답</th><th>α</th><th class="l">판정</th></tr>'+alphaRows.map(([k,n,q,c,a])=>`<tr><td>${k}</td><td class="l">${n}</td><td class="num">${q}</td><td class="num">${c}</td><td class="num"><b>${a==null?'–':a.toFixed(2)}</b></td><td class="l">${a==null?'<span class="muted">응답 부족</span>':a>=.9?'<span class="chip t-우선개선">매우 높음 · 중복 검토</span>':a>=.7?'<span class="chip t-핵심경쟁">양호</span>':a>=.6?'<span class="chip t-확장가능">보통</span>':'<span class="chip t-재구조화">낮음 · 문항 점검</span>'}</td></tr>`).join('');
+  // ---------- Ⅲ 기존 과정 개선 ----------
+  { const c34=count(p1,'Q37',META.OPT.Q37,true);
+    hbars($('#q34'),[...c34.items].sort((a,b)=>b.n-a.n).filter(i=>i.o!=='기타'||i.n).map(i=>({label:i.o,v:i.p})),{max:1,limit:13});
+    $('#q34').insertAdjacentHTML('beforeend',`<p class="note">응답자 ${c34.base}명</p>`);
+    $('#q3536').innerHTML='<div><h3>36. 2027 운영 방향</h3><div id="h35"></div></div><div><h3>38. 후속·심화과정 참여의향 <span class="muted" style="font-weight:400">긍정 '+pc(pos36(p1))+'</span></h3><div id="h36"></div></div>';
+    hbars($('#h35'),count(p1,'Q36',META.OPT.Q36,false).items.map(i=>({label:i.o,v:i.p})),{max:1});
+    hbars($('#h36'),count(p1,'Q38',META.OPT.Q38,false).items.map(i=>({label:i.o,v:i.p})),{max:1}); }
+  // ---------- Ⅳ 2027 수요 ----------
+  const F=[['Q40','AI·디지털'],['Q41','직업·직무'],['Q43','문화·시민·웰니스']];
+  { const rsd=dGrpV?rs.filter(r=>r['그룹']===dGrpV):rs, p1d=rsd.filter(r=>r['그룹']===G1);
+    $('#dScope').textContent=dGrpV?(dGrpV===G1?GL1:GL2):'G1 + G2 전체';
+    $('#dNote').hidden=!!rsd.length; $('#dNote').textContent=rsd.length?'':'선택한 조건에 해당하는 응답이 없습니다. 상단 응답그룹 필터와 이 섹션의 그룹 선택이 서로 다를 수 있습니다.';
+    const iv=F.map(([q,t])=>[t,interest(rsd,q)]).sort((a,b)=>(b[1]||0)-(a[1]||0));
+    const topOf=q=>{const c=count(rsd,q,META.OPT[q],true);const it=c.items.filter(i=>i.o!==NONE&&i.o!=='기타').sort((a,b)=>b.n-a.n)[0];return it&&it.n?it.o:'–';};
+    $('#kpis2').innerHTML=[
+      ['응답 수',rsd.length+'<small>건</small>',dGrpV?(dGrpV===G1?GL1:GL2)+' 기준':`G1 ${p1d.length}명 · G2 ${rsd.length-p1d.length}명`],
+      ['참여의향 가장 높은 분야',`<span style="font:600 16px var(--sans)">${esc(iv[0][0])}</span>`,pc(iv[0][1])+' (관심 없음 제외)'],
+      ...F.map(([q,t])=>[t+' 희망 1위',`<span style="font:600 16px var(--sans)">${esc(topOf(q))}</span>`,`${q.slice(1)}번 · 참여의향 ${pc(interest(rsd,q))}`])
+    ].map(kpi).join('');
+    { const c=count(rsd,'Q39',META.OPT.Q39,true);
+      hbars($('#s6'),[...c.items].sort((a,b)=>b.n-a.n).filter(i=>i.o!=='기타'||i.n).map(i=>({label:i.o,v:i.p})),{max:1});
+      $('#s6').insertAdjacentHTML('beforeend',`<p class="note">응답자 ${c.base}명</p>`); }
+    const grpCols=[['전체',rs,''],[GL1,rs.filter(r=>r['그룹']===G1),G1],[GL2,rs.filter(r=>r['그룹']===G2),G2]];
+    $('#fieldtable').innerHTML='<tr><th class="l">분야</th>'+grpCols.map(([g,r,k])=>`<th class="${dGrpV&&k===dGrpV?'selcol':''}">${g}<br><span class="muted" style="font-weight:400">n=${r.length}</span></th>`).join('')+'</tr>'
+      +F.map(([q,t])=>`<tr><td class="l">${t} <span class="muted">(${q.slice(1)}번)</span></td>${grpCols.map(([g,r,k])=>{const v=interest(r,q);return`<td class="num ${dGrpV&&k===dGrpV?'selcol':''}"><div class="ib"><span style="width:${v==null?0:Math.round(v*100)}%"></span></div><b>${pc(v)}</b></td>`;}).join('')}</tr>`).join('');
+    $('#topics').innerHTML=F.map(([q,t])=>`<div><h3>${q.slice(1)}. ${t} <span class="muted" style="font-weight:400">관심 없음 ${pc(1-(interest(rsd,q)??1))}</span></h3><div id="tp-${q}"></div></div>`).join('');
+    F.forEach(([q])=>{const c=count(rsd,q,META.OPT[q],true);const it=c.items.filter(i=>i.o!==NONE).sort((a,b)=>b.n-a.n).filter(i=>i.o!=='기타'||i.n);hbars($('#tp-'+q),it.map(i=>({label:i.o,v:i.p})),{max:1,limit:6,top:it[0]&&it[0].n?it[0].o:null});});
+    const r39=rsd.filter(r=>r.Q41&&!has(r.Q41,NONE)),c39=count(r39,'Q42',META.OPT.Q42,true);
+    hbars($('#q39'),[...c39.items].sort((a,b)=>b.n-a.n).filter(i=>i.o!=='기타'||i.n).map(i=>({label:i.o,v:i.p})),{max:1});
+    $('#q39').insertAdjacentHTML('beforeend',`<p class="note">응답자 ${c39.base}명 (직업·직무 교육 참여의향자)</p>`);
+    $('#ops').innerHTML='<div><h3>45. 선호 시간대 (복수)</h3><div id="o41"></div></div><div><h3>46. 선호 운영 방식 (복수)</h3><div id="o42"></div></div>';
+    hbars($('#o41'),[...count(rsd,'Q45',META.OPT.Q45,true).items].sort((a,b)=>b.n-a.n).map(i=>({label:i.o,v:i.p})),{max:1});
+    hbars($('#o42'),[...count(rsd,'Q46',META.OPT.Q46,true).items].sort((a,b)=>b.n-a.n).map(i=>({label:i.o,v:i.p})),{max:1});
+    { const withS=rsd.filter(r=>(r.Q44||'').trim()), grp=new Map();
+      withS.forEach(r=>{const t=r.Q44.trim().replace(/\s+/g,' ');const key=t.replace(/[\s·.,!?~()]/g,'');const g=grp.get(key)||{t,n:0,a:0,b:0};g.n++;r['그룹']===G1?g.a++:g.b++;grp.set(key,g);});
+      const list=[...grp.values()].sort((x,y)=>y.n-x.n||x.t.localeCompare(y.t,'ko'));
+      const rep=list.filter(g=>g.n>=2).length;
+      $('#q41').innerHTML=`<div class="grid kpis" style="margin-bottom:12px">${[
+        ['제안 응답 수',withS.length+'<small>건</small>',`응답률 ${pc(rsd.length?withS.length/rsd.length:null)}`],
+        ['서로 다른 제안',list.length+'<small>개</small>','비슷한 표현은 보고서 작성 시 주제별로 재분류'],
+        ['2회 이상 반복 제안',rep+'<small>개</small>','신규 후보 검토 대상']].map(kpi).join('')}</div>`+
+        (list.length?`<div class="tablewrap" style="max-height:360px;overflow:auto"><table><tr><th class="l">제안 내용</th><th>전체</th><th>${GL1}</th><th>${GL2}</th></tr>${list.map(g=>`<tr><td class="l">${esc(g.t)}${g.n>=2?' <span class="muted">· 반복</span>':''}</td><td class="num"><b>${g.n}</b></td><td class="num">${g.a}</td><td class="num">${g.b}</td></tr>`).join('')}</table></div>`:'<p class="note">아직 제안 응답이 없습니다.</p>'); } }
+  // ---------- Ⅴ 응답자 정보 ----------
+  const rsp=pGrpV?rs.filter(r=>r['그룹']===pGrpV):rs, p1p=rsp.filter(r=>r['그룹']===G1);
+  $('#pScope').textContent=pGrpV?(pGrpV===G1?GL1:GL2):'G1 + G2 전체';
+  $('#pNote').hidden=!!rsp.length; $('#pNote').textContent=rsp.length?'':'선택한 조건에 해당하는 응답이 없습니다. 상단 응답그룹 필터와 이 섹션의 그룹 선택이 서로 다를 수 있습니다.';
+  $('#demo').innerHTML=[['Q47','47. 연령대'],['Q48','48. 성별'],['Q49','49. 신분'],['Q1','1. 교육 참여 목적 (G1 전용)']].map(([q,t])=>`<div><h3>${t} <span class="muted" style="font-weight:400">n=${(q==='Q1'?p1p:rsp).filter(r=>r[q]).length}</span></h3><div id="d-${q}"></div></div>`).join('');
+  [['Q47',0],['Q48',0],['Q49',1],['Q1',1]].forEach(([q,sort])=>{const c=count(q==='Q1'?p1p:rsp,q,META.OPT[q],false);let it=c.items.filter(i=>i.o!=='기타'||i.n).map(i=>({label:i.o,v:i.p}));if(sort)it.sort((a,b)=>b.v-a.v);hbars($('#d-'+q),it,{limit:10,max:1});});
+}
+
+// filters
+function fillCourseFilter(){const s=$('#fCourse'),cur=s.value;s.innerHTML='<option value="">전체 과정</option>'+COURSES.map(c=>`<option>${esc(c.n)}</option>`).join('');s.value=cur;if(s.value!==cur)s.value='';}
+['#fType','#fCat'].forEach(s=>$(s).onchange=()=>{$('#fCourse').value='';refresh();});
+['#fCourse','#fGrp','#fW'].forEach(s=>$(s).onchange=refresh);
+// CSV
+function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;}else if(ch==='"')q=true;else if(ch===','){row.push(f);f='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f='';}else f+=ch;}if(f||row.length){row.push(f);out.push(row);}return out;}
+function toast(m){document.querySelectorAll('.toast').forEach(x=>x.remove());const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),Math.max(2600,m.length*90));}
+const norm=s=>String(s==null?'':s).replace(/\s+/g,' ').trim();
+const dateOf=v=>{v=norm(v);if(/^\d{4}-\d{2}-\d{2}/.test(v))return v.slice(0,10);const d=new Date(v);if(v&&!isNaN(d)){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}return v;};
+// Tally 내보내기의 Submitted at은 UTC("2026-10-06 02:13:03") → 한국 시간(+9시간) 날짜로 바꿈 (2026-10-06 실제 파일로 확인)
+const TZ_H=9;
+// 구글시트 연동본은 시(時)가 한 자리("2026-10-06 2:13:03")로 올 수 있어 한두 자리 모두 받음
+const atParts=v=>norm(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/);
+const kstISO=m=>new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]+TZ_H,+m[5])).toISOString();
+const kstDate=v=>{const m=atParts(v);return m?kstISO(m).slice(0,10):dateOf(v);};
+const kstAt=v=>{const m=atParts(v);return m?kstISO(m).slice(0,16).replace('T',' '):'';};
+// 집계 기준: 매일 오전 09:00(한국 시간). 구글시트에서 자동으로 불러온 응답은 기준 시각 이전 것만 집계
+const CUT_H=9;let cutOn=false,cutLive=false,cutInfo=null,srcKind='sample',pubFail=false;
+function cutPoint(now){const k=new Date((now||Date.now())+TZ_H*3600e3);if(k.getUTCHours()<CUT_H)k.setUTCDate(k.getUTCDate()-1);return k.toISOString().slice(0,10)+' '+String(CUT_H).padStart(2,'0')+':00';}
+function applyCut(rows){
+  if(!cutOn){cutInfo=null;return rows;}
+  if(cutLive){cutInfo={at:null,late:0};return rows;}
+  const c=cutPoint(),keep=rows.filter(r=>!r['응답시각']||r['응답시각']<c);
+  cutInfo={at:c,late:rows.length-keep.length};return keep;}
+function setTail(){
+  const t=srcKind==='sample'?(pubFail?' · 집계 데이터를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로 고쳐 주십시오.':' · 집계 데이터를 불러오는 중입니다.')
+    :srcKind==='file'?' · 불러온 파일 기준입니다.'
+    :cutInfo&&cutInfo.at?` · 집계 기준 ${cutInfo.at} (매일 오전 09:00 기준)${cutInfo.late?` · 기준 시각 이후 응답 ${cutInfo.late}건은 다음 집계에 반영됩니다`:''}`
+    :' · 지금까지 들어온 응답 전체입니다 (실시간)';
+  const a=$('#nTail'),b=$('#nTail2');if(a)a.textContent=t;
+  if(b)b.textContent=srcKind==='sheet'?(cutInfo&&cutInfo.at?` 집계 기준 ${cutInfo.at} (매일 오전 09:00)${cutInfo.late?` · 이후 응답 ${cutInfo.late}건은 다음 집계에 반영`:''}`:' 지금까지 들어온 응답 전체 (실시간)'):'';}
+// Tally에서 내려받은 원본 CSV → 응답데이터 형식. 문항은 머리글 문구로 찾고(열 순서 무관), 같은 머리글이 둘이면 응답이 많은 열을 씀. 성명·휴대전화 열은 읽지 않음
+function tallyRows(tb,hi){
+  const H=tb[hi].map(norm),body=tb.slice(hi+1).filter(r=>r.some(c=>norm(c)!==''));
+  const filled=i=>body.filter(r=>norm(r[i])!=='').length;
+  const cands=p=>H.map((h,i)=>i).filter(i=>p[1]===null?H[i]===p[0]:(H[i].startsWith(p[0])&&H[i].endsWith(p[1])));
+  const find=p=>{const c=cands(p);return c.length?c.sort((a,b)=>filled(b)-filled(a)||a-b)[0]:-1;};
+  const isDem=find(META.PAT.dem.Q39)>=0&&find(META.PAT.main.Q1)<0, isMain=find(META.PAT.main.Q1)>=0||find(META.PAT.main.Q2)>=0;
+  if(!isDem&&!isMain)return null;
+  const P=isDem?META.PAT.dem:META.PAT.main,miss=[],col={};
+  Object.keys(P).forEach(k=>{col[k]=find(P[k]);
+    if(col[k]<0&&META.MULTI.includes(k)){const oc=META.OPT[k].map(o=>[o,H.findIndex(h=>h.startsWith(P[k][0])&&h.endsWith('('+o+')'))]).filter(x=>x[1]>=0);if(oc.length)col[k]=oc;}
+    if(col[k]<0&&!['과정선택','과정명입력','과정성격'].includes(k))miss.push(k);});
+  const iId=H.indexOf('Submission ID'),iAt=H.indexOf('Submitted at'),iC=H.indexOf('course'),iT=H.indexOf('type');
+  const val=(r,c)=>Array.isArray(c)?c.filter(([o,i])=>/^(true|1|yes|y|o|✓|✔)$/i.test(norm(r[i]))||norm(r[i])===o).map(x=>x[0]).join(', '):c>=0?norm(r[c]):'';
+  const rows=body.filter(r=>norm(r[iId])).map(r=>{const o={'응답ID':norm(r[iId]),'응답일':iAt>=0?kstDate(r[iAt]):'','응답시각':iAt>=0?kstAt(r[iAt]):'','그룹':'','설문':isDem?'수요조사':'수강생용','과정코드':!isDem&&iC>=0?norm(r[iC]):'','유형코드':!isDem&&iT>=0?norm(r[iT]):'','과정명':''};
+    Object.keys(P).forEach(k=>{o[k]=val(r,col[k]);});return o;});
+  return {kind:isDem?'dem':'main',rows,miss};
+}
+let RAW={main:null,dem:null};
+// 방문 기록: Tally 방문 통계를 매일 옮겨 적은 표(방문일·설문·방문수·테스트제외). 집계 방문 수 = 방문수 − 테스트제외
+let VISITS=SAMPLE_VISITS.map(x=>({d:x[0],s:x[1],v:x[2]})),visitsReal=false;
+function visitRows(tb,hi){const H=tb[hi].map(norm),iD=H.indexOf('방문일'),iS=H.indexOf('설문'),iV=H.indexOf('방문수'),iX=H.indexOf('테스트제외');
+  if(iS<0||iV<0)return null;const num=v=>{const n=parseFloat(norm(v).replace(/,/g,''));return isNaN(n)?0:n;};
+  const m=new Map();
+  tb.slice(hi+1).forEach(r=>{const d=dateOf(r[iD]),s=norm(r[iS]);if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!s)return;m.set(d+'|'+s,{d,s,v:Math.max(0,num(r[iV])-(iX>=0?num(r[iX]):0))});});
+  return [...m.values()].sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);}
+// 여러 CSV 글을 한 번에 반영. 반환: 안내 문구(성공) 또는 null(실패)
+function ingest(texts,label,sheet){
+  let full=null,msg=[],bad=0,miss=[],vis=null;
+  texts.forEach(t=>{const tb=parseCSV(String(t).replace(/^﻿/,''));
+    const hv=tb.findIndex(r=>r.some(c=>norm(c)==='방문일'));
+    if(hv>=0){const vr=visitRows(tb,hv);if(vr)vis=vr;else bad++;return;}
+    let hi=tb.findIndex(r=>r.some(c=>norm(c)==='응답ID'));
+    if(hi>=0){const cols=tb[hi].map(norm),k=cols.indexOf('응답ID');full={cols,body:tb.slice(hi+1).filter(r=>norm(r[k]))};return;}
+    hi=tb.findIndex(r=>r.some(c=>norm(c)==='Submission ID'));
+    const res=hi>=0?tallyRows(tb,hi):null;
+    if(!res){bad++;return;}
+    RAW[res.kind]=res.rows;miss=miss.concat(res.miss.map(k=>(res.kind==='dem'?'수요조사 ':'수강생용 ')+k));
+    msg.push(`${res.kind==='dem'?'수요조사':'수강생용'} ${res.rows.length}건`);});
+  if(vis){VISITS=vis;visitsReal=true;}
+  else if((full||msg.length)&&!visitsReal)VISITS=[];   // 실제 응답을 올리면 가상 방문 기록은 비움
+  const vmsg=vis?`방문 기록 ${vis.length}줄(${new Set(vis.map(x=>x.d)).size}일치)`:'';
+  if(full||msg.length){cutOn=!!sheet&&!full;srcKind=sheet?'sheet':'file';}
+  if(full){RAW={main:null,dem:null};cutInfo=null;load(full.cols,full.body);}
+  else if(msg.length){loadObjs(applyCut((RAW.main||[]).concat(RAW.dem||[])));}
+  else if(vis){refresh();return vmsg+'을 불러왔습니다'+(bad?` · 알 수 없는 형식의 파일 ${bad}개는 건너뜀`:'');}
+  else{toast('머리글에 "응답ID"(산출계산시트 [응답데이터]), "Submission ID"(Tally 내보내기), "방문일"(방문 기록) 중 하나가 있어야 합니다.');return null;}
+  document.querySelectorAll('.notice b').forEach((b,i)=>{if(i===0||b.dataset.d)b.textContent=label;});setTail();
+  let m=full?`응답 ${DATA.length}건을 불러왔습니다`:`${msg.join(' · ')}을 불러왔습니다`;
+  if(!full&&!RAW.main)m+=sheet?' · 수강생용 응답 탭을 불러오지 못했습니다':' · 수강생용 설문 파일도 함께 올려 주세요';
+  if(!full&&!RAW.dem)m+=sheet?' · 수요조사 응답 탭을 불러오지 못했습니다':' · 수요조사 설문 파일도 함께 올려 주세요';
+  if(cutInfo&&cutInfo.at)m+=` · 집계 기준 ${cutInfo.at}${cutInfo.late?`(이후 ${cutInfo.late}건 제외)`:''}`;
+  if(miss.length)m+=` · 찾지 못한 문항: ${miss.slice(0,6).join(', ')}${miss.length>6?' 외':''} (설문 문구가 바뀌었는지 확인)`;
+  if(vmsg)m+=` · ${vmsg}`;
+  if(bad)m+=` · 알 수 없는 형식의 파일 ${bad}개는 건너뜀`;
+  return m;
+}
+// 파일 읽기: UTF-8이 아니면(Excel에서 "CSV (쉼표로 분리)"로 저장한 경우) EUC-KR로 다시 읽음
+function readText(file){return file.arrayBuffer().then(buf=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch(e){return new TextDecoder('euc-kr').decode(buf);}});}
+function onFiles(e){const fs=[...e.target.files];if(!fs.length)return;Promise.all(fs.map(readText)).then(ts=>{const m=ingest(ts,'불러온 데이터');if(m)toast(m);e.target.value='';});}
+$('#csv').onchange=onFiles;
+function resetSample(){RAW={main:null,dem:null};VISITS=SAMPLE_VISITS.map(x=>({d:x[0],s:x[1],v:x[2]}));visitsReal=false;cutOn=false;cutInfo=null;srcKind='sample';load(SAMPLE.cols,SAMPLE.rows);document.querySelectorAll('.notice b').forEach((b,i)=>{if(i===0||b.dataset.d)b.textContent='집계 데이터';});setTail();}
+$('#reset').onclick=resetSample;
+function showTab(id){['dash','sv'].forEach(k=>{$('#tab-'+k).setAttribute('aria-selected',k===id);$('#pane-'+k).hidden=k!==id;});}
+document.querySelectorAll('#pGrp button').forEach(b=>b.onclick=()=>{pGrpV=b.dataset.g;document.querySelectorAll('#pGrp button').forEach(x=>x.classList.toggle('on',x===b));refresh();});
+document.querySelectorAll('#dGrp button').forEach(b=>b.onclick=()=>{dGrpV=b.dataset.g;document.querySelectorAll('#dGrp button').forEach(x=>x.classList.toggle('on',x===b));refresh();});
+$('#tab-dash').onclick=()=>showTab('dash');$('#tab-sv').onclick=()=>showTab('sv');
+
+// ---------------- 설문 링크 · 응답 현황 ----------------
+const PERIOD='2026년 10월 7일 ~ 10월 18일';
+const SURVEYS=META.COURSES.map(c=>({k:'m',name:c[1]==='인문교양'?'인문교양 교육과정':c[1],t:c[1],tag:`G1. 수강생용 · ${c[2]}`,u:`${META.URL.main}?course=${c[0]}&type=${c[2][0]}`,n:'49문항 (품질 34 + 개선·수요·응답자 15)',m:'약 10분',
+    d:`「${c[1]==='인문교양'?'인문교양 교육과정':c[1]}」 수강자용 · 과정 안내와 27~30번 성과 문항(${c[2]})이 이 과정에 맞게 표시됩니다.`}))
+  .concat([{k:'d',name:'',t:'수요조사 설문',tag:'G2. 잠재 학습자용',u:META.URL.dem,n:'11문항',m:'약 3분',
+    d:'앵커사업 교육을 수강하지 않은 평생교육 학습자·시민에게 보내는 링크입니다. 수강생용 설문의 39~49번과 같은 문항(수요 8 + 응답자 정보 3)입니다.'}]);
+const SUMCOLS=['응답ID','응답일','그룹','설문','과정명','Q1','Q38','Q39','Q40','Q43','Q47','Q48','Q49','답례품응모'];
+const COLLABEL={'과정명':'참여 과정','과정코드':'과정코드(링크)','유형코드':'유형코드(링크)','과정선택':'과정 선택(통합 링크)','과정명입력':'기타 과정명','과정성격':'과정 성격','Q1':'참여 목적','Q36':'2027 운영 방향','Q37':'우선 개선사항','Q38':'후속과정 의향','Q39':'필요 역량(S6)','Q40':'AI·디지털 수요','Q41':'직업·직무 수요','Q42':'직업·직무 필요 요소','Q43':'문화·웰니스 수요','Q44':'자유 제안','Q45':'선호 시간대','Q46':'선호 운영 방식','Q47':'연령','Q48':'성별','Q49':'신분','답례품응모':'답례품 응모'};
+const clabel=c=>COLLABEL[c]||c;
+let oPage=1;
+function personDaqi(r){const v=AREAS.map(a=>areaAvg(r,a)).filter(x=>x!=null);return v.length===AREAS.length?v.reduce((x,y)=>x+y,0)/v.length/5*100:null;}
+function consentCol(){return (DATA[0]?Object.keys(DATA[0]):[]).find(c=>/응모|동의/.test(c));}
+
+function renderLinks(){
+  $('#links').innerHTML=SURVEYS.map((s,i)=>{
+    let qr='';
+    try{const q=qrcode(0,'M');q.addData(s.u);q.make();qr=q.createSvgTag({cellSize:3,margin:2,scalable:true});}catch(e){qr='<span class="muted">QR 생성 실패</span>';}
+    return `<div class="lcard"><div class="lqr">${qr}</div>
+      <div class="lbody"><div class="ltag ${s.k==='d'?'g2':'g1'}">${esc(s.tag)}</div><h3 class="opsh" style="margin:0 0 4px">${esc(s.t)}</h3>
+        <p class="lmeta">${s.n} · ${s.m}</p><p class="ldesc">${esc(s.d)}</p>
+        <div class="lurl"><code>${esc(s.u)}</code></div>
+        <div class="lbtns"><button class="btn" data-copy="${esc(s.u)}">링크 복사</button><a class="btn" href="${s.u}" target="_blank" rel="noopener">설문 열기</a><button class="btn primary" data-msg="${i}">발송 문구 보기</button></div>
+      </div></div>`;}).join('');
+  $('#links').querySelectorAll('[data-msg]').forEach(b=>b.onclick=()=>openMsg(+b.dataset.msg));
+  $('#links').querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{navigator.clipboard?.writeText(b.dataset.copy).then(()=>toast('링크를 복사했습니다'),()=>toast('복사하지 못했습니다'));});
+}
+
+
+// ---- 발송 문구 ----
+const MSGOF=s=>s.k==='d'?{
+  sms:`[동국대학교 평생교육] 2027년 교육 수요조사 안내
+
+안녕하세요. 동국대학교 앵커평생교육팀입니다.
+동국대학교 평생교육에 관심을 가져 주셔서 감사합니다.
+
+2027년에 새롭게 개설할 평생교육 프로그램을 준비하기 위해 시민 여러분의 의견을 수렴하고자 합니다.
+
+· 소요시간: 약 3분 (11문항)
+· 조사기간: 10월 7일(수) ~ 10월 18일(일)
+· 응답해 주신 분 중 추첨을 통해 답례품을 드립니다
+
+▶ 설문 참여하기
+${s.u}
+
+응답 내용은 통계 분석에만 사용되며 개별 응답은 공개되지 않습니다.
+소중한 의견 부탁드립니다. 감사합니다.
+
+동국대학교 앵커평생교육팀`,
+  sms_short:`[동국대 평생교육] 2027년 교육 수요조사에 참여해 주십시오. 약 3분, 추첨 답례품 증정. ~10/18
+${s.u}`,
+  subject:`[동국대학교 평생교육] 2027학년도 신규 프로그램 개발을 위한 수요조사 참여 요청 (~10/18)`,
+  mail:`안녕하십니까.
+동국대학교 앵커평생교육팀입니다.
+
+동국대학교 평생교육에 관심을 가져 주셔서 깊이 감사드립니다.
+본 조사는 2027학년도에 동국대학교가 새롭게 개설할 평생교육 프로그램을 준비하기 위해, 시민 여러분이 희망하는 교육과정을 여쭙고자 실시합니다.
+
+■ 조사 대상 : 평생교육에 관심 있는 시민 누구나
+■ 조사 기간 : 2026년 10월 7일(수) ~ 10월 18일(일)
+■ 소요 시간 : 약 3분 (11문항)
+■ 참여 방법 : 아래 링크 접속 후 응답
+   ${s.u}
+
+응답 내용은 통계 분석 목적 외에는 사용되지 않으며, 개별 응답은 외부에 공개되지 않습니다.
+설문 마지막의 답례품 응모(선택)에 참여하시면 추첨을 통해 답례품을 보내 드립니다. 입력하신 연락처는 추첨·발송에만 사용하고 발송 완료 후 즉시 파기합니다.
+
+여러분의 의견은 2027년 프로그램 개발에 소중히 활용하겠습니다.
+조사에 협조해 주셔서 감사합니다.
+
+동국대학교 앵커평생교육팀 드림`
+}:{
+  sms:`[동국대학교 평생교육] 교육 만족도·수요조사 안내
+
+안녕하세요. 동국대학교 앵커평생교육팀입니다.
+「${s.name}」에 참여해 주셔서 감사합니다.
+
+참여하신 교육과정의 개선과 2027년 신규 프로그램 개발을 위해 수강생 여러분의 의견을 수렴하고자 합니다.
+
+· 소요시간: 약 10분
+· 조사기간: 10월 7일(수) ~ 10월 18일(일)
+· 응답해 주신 분 중 추첨을 통해 답례품을 드립니다
+
+▶ 설문 참여하기
+${s.u}
+
+응답 내용은 통계 분석에만 사용되며 개별 응답은 공개되지 않습니다.
+소중한 의견 부탁드립니다. 감사합니다.
+
+동국대학교 앵커평생교육팀`,
+  sms_short:`[동국대 평생교육] 「${s.name}」 수강생 설문에 참여해 주십시오. 약 10분, 추첨 답례품 증정. ~10/18
+${s.u}`,
+  subject:`[동국대학교 평생교육] 2027학년도 교육과정 개선을 위한 설문조사 참여 요청 (~10/18)`,
+  mail:`안녕하십니까.
+동국대학교 앵커평생교육팀입니다.
+
+동국대학교 평생교육 「${s.name}」에 참여해 주셔서 깊이 감사드립니다.
+본 조사는 참여하신 교육과정의 품질을 점검하고, 2027학년도 교육과정 개선 및 신규 프로그램 개발에 반영하고자 실시합니다.
+
+■ 조사 대상 : 2025~2026년 동국대학교 평생교육 프로그램 수강자
+■ 조사 기간 : 2026년 10월 7일(수) ~ 10월 18일(일)
+■ 소요 시간 : 약 10분
+■ 참여 방법 : 아래 링크 접속 후 응답
+   ${s.u}
+
+응답 내용은 통계 분석 목적 외에는 사용되지 않으며, 개별 응답은 외부에 공개되지 않습니다.
+설문 마지막의 답례품 응모(선택)에 참여하시면 추첨을 통해 답례품을 보내 드립니다. 입력하신 연락처는 추첨·발송에만 사용하고 발송 완료 후 즉시 파기합니다.
+
+여러분의 의견은 더 나은 평생교육 환경과 2027년 프로그램 개발에 소중히 활용하겠습니다.
+조사에 협조해 주셔서 감사합니다.
+
+동국대학교 앵커평생교육팀 드림`
+};
+let msgIdx=0,msgTab='sms';
+const bytes=t=>{let n=0;for(const ch of t)n+=ch.charCodeAt(0)>127?2:1;return n;};
+function msgField(id,label,val,rows,meta){
+  return `<div class="mfield"><label for="${id}">${label}</label><textarea id="${id}" spellcheck="false" style="min-height:${rows}px">${esc(val)}</textarea>
+    <div class="mrow"><span class="muted" id="${id}-m">${meta||''}</span><button class="btn" data-cp="${id}">복사</button></div></div>`;
+}
+function renderMsg(){
+  const sv=SURVEYS[msgIdx],m=MSGOF(sv);
+  $('#msgTitle').textContent=`설문 발송 문구 — ${sv.t}`;
+  document.querySelectorAll('#msgTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===msgTab));
+  if(msgTab==='sms'){
+    $('#msgHint').textContent='문자(LMS)·카카오톡·알림톡에 붙여 넣어 사용하십시오. 수신자 이름이 필요하면 첫 줄 뒤에 넣으십시오. 90바이트가 넘으면 LMS로 발송됩니다.';
+    $('#msgBody').innerHTML=msgField('mSms','기본 문구 (LMS·카카오톡)',m.sms,230,`${bytes(m.sms)}바이트`)
+      +msgField('mSmsS','짧은 문구 (단문 SMS용)',m.sms_short,110,`${bytes(m.sms_short)}바이트`);
+  }else{
+    $('#msgHint').textContent='이메일 제목과 본문입니다. 서명·문의처는 기관 양식에 맞게 고쳐 쓰십시오.';
+    $('#msgBody').innerHTML=`<div class="mfield"><label for="mSub">제목</label><input id="mSub" value="${esc(m.subject)}">
+      <div class="mrow"><span class="muted">${m.subject.length}자</span><button class="btn" data-cp="mSub">복사</button></div></div>`
+      +msgField('mMail','본문',m.mail,300,`${m.mail.length}자`);
+  }
+  $('#msgBody').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{
+    const el=document.getElementById(b.dataset.cp);
+    navigator.clipboard?.writeText(el.value).then(()=>toast('문구를 복사했습니다'),()=>toast('복사하지 못했습니다'));});
+  $('#msgBody').querySelectorAll('textarea').forEach(t=>t.oninput=()=>{const m2=document.getElementById(t.id+'-m');if(m2)m2.textContent=`${bytes(t.value)}바이트`;});
+}
+function openMsg(i){msgIdx=i;msgTab='sms';$('#msgModal').hidden=false;renderMsg();}
+document.querySelectorAll('#msgTabs button').forEach(b=>b.onclick=()=>{msgTab=b.dataset.t;renderMsg();});
+$('#msgClose').onclick=()=>{$('#msgModal').hidden=true;};
+$('#msgModal').onclick=e=>{if(e.target.id==='msgModal')$('#msgModal').hidden=true;};
+addEventListener('keydown',e=>{if(e.key==='Escape')$('#msgModal').hidden=true;});
+
+function renderOps(){
+  const all=DATA, g1=all.filter(r=>r['그룹']===G1), g2=all.filter(r=>r['그룹']===G2);
+  const days=[...new Set(all.map(r=>r['응답일']).filter(Boolean))].sort();
+  const d=daqi(g1);
+  const cc=consentCol(); const consent=cc?all.filter(r=>/동의/.test(r[cc])&&!/않/.test(r[cc])).length:null;
+  const kpi=k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${k[2]}</div></div>`;
+  $('#opsKpis').innerHTML=[
+    ['전체 응답',all.length+'<small>건</small>',days.length?`${days[0]} ~ ${days[days.length-1]}`:'–'],
+    [GL1,g1.length+'<small>건</small>',`과정 ${new Set(g1.map(r=>r['과정명']).filter(Boolean)).size}개 · 수강생용 설문`],
+    [GL2,g2.length+'<small>건</small>','수요조사 설문'],
+    [cc?'답례품 응모':'현재 DAQI_EL',cc?consent+'<small>건</small>':f1(d.d)+`<small>${grade(d.d)}등급</small>`,cc?`응모율 ${all.length?Math.round(consent/all.length*100):0}%`:'G1 기준']
+  ].map(kpi).join('');
+  $('#opsAsOf').textContent=`불러온 응답 ${all.length}건 기준 · 화면 갱신 ${new Date().toLocaleString('ko-KR',{hour12:false})}`;
+  // 일자별 추이
+  if(!days.length){$('#opsTrend').innerHTML='<p class="muted">응답일 데이터가 없습니다.</p>';}
+  else{const cnt=days.map(dd=>({d:dd,a:all.filter(r=>r['응답일']===dd&&r['그룹']===G1).length,b:all.filter(r=>r['응답일']===dd&&r['그룹']===G2).length}));
+    const mx=Math.max(...cnt.map(c=>c.a+c.b),1),W=520,H=150,bw=Math.min(28,(W-40)/cnt.length-4);
+    let s=`<svg viewBox="0 0 ${W} ${H+26}" width="100%" role="img" aria-label="일자별 응답 수">`;
+    cnt.forEach((c,i)=>{const x=30+i*((W-40)/cnt.length),ha=(c.a/mx)*H,hb=(c.b/mx)*H;
+      s+=`<rect x="${x}" y="${H-ha}" width="${bw}" height="${ha}" rx="2" style="fill:var(--acc)"/>`;
+      s+=`<rect x="${x}" y="${H-ha-hb}" width="${bw}" height="${hb}" rx="2" style="fill:var(--hl)" opacity=".75"/>`;
+      if(i%Math.ceil(cnt.length/7)===0)s+=`<text x="${x+bw/2}" y="${H+16}" font-size="10" text-anchor="middle" style="fill:var(--ink3)">${c.d.slice(5)}</text>`;});
+    s+=`<line x1="24" x2="${W-6}" y1="${H}" y2="${H}" stroke="var(--line)"/></svg>`;
+    s+=`<div class="legend"><span><svg width="10" height="10"><rect width="10" height="10" rx="2" style="fill:var(--acc)"/></svg> G1. 교육 수강자</span><span><svg width="10" height="10"><rect width="10" height="10" rx="2" style="fill:var(--hl)" opacity=".75"/></svg> G2. 잠재 학습자</span><span>최대 ${mx}건/일</span></div>`;
+    $('#opsTrend').innerHTML=s;}
+  // 과정별
+  const rows=COURSES.map(c=>{const rs=g1.filter(r=>r['과정명']===c.n);return {n:c.n,t:c.t,k:rs.length};});
+  const etc=g1.filter(r=>r['과정명']==='기타'||!r['과정명']); if(etc.length)rows.push({n:'과정 미확인·기타',t:'–',k:etc.length});
+  const badge=k=>k>=TH.MIN?'<span class="bd ok">등급 산출</span>':k>=TH.REF?'<span class="bd mid">참고치</span>':'<span class="bd low">유형 통합</span>';
+  $('#opsCourse').innerHTML='<thead><tr><th>과정</th><th>유형</th><th class="num">응답</th><th>결과 제시</th></tr></thead><tbody>'+
+    rows.map(r=>`<tr><td>${esc(r.n)}</td><td>${r.t}</td><td class="num">${r.k}</td><td>${badge(r.k)}</td></tr>`).join('')+
+    `<tr class="tot"><td>G2. 잠재 학습자</td><td>–</td><td class="num">${g2.length}</td><td>${g2.length>=TH.MIN?'<span class="bd ok">집계 가능</span>':'<span class="bd mid">표본 부족</span>'}</td></tr></tbody>`;
+  renderTable();
+  renderVisits();
+}
+
+// ---------------- 설문 방문 통계 ----------------
+function renderVisits(){
+  const box=$('#visitBox');if(!box)return;
+  const SV=[['수강생용','G1. 수강생용 설문','과정별 링크 6개 합계','var(--acc)'],['수요조사','G2. 수요조사 설문','링크 1개','var(--hl)']];
+  if(!VISITS.length){$('#visitAsOf').textContent='방문 기록 없음';
+    box.innerHTML='<p class="note">방문 기록이 아직 없습니다.</p>';return;}
+  const days=[...new Set(VISITS.map(x=>x.d))].sort(),d0=days[0],d1=days[days.length-1];
+  const svOf=r=>r['설문']||(r['그룹']===G2?'수요조사':'수강생용');
+  const vsum=s=>VISITS.filter(x=>x.s===s).reduce((a,x)=>a+x.v,0);
+  const rsum=s=>DATA.filter(r=>svOf(r)===s&&(!r['응답일']||(r['응답일']>=d0&&r['응답일']<=d1))).length;
+  const rows=SV.map(([s,t,sub,c])=>({s,t,sub,c,v:vsum(s),r:rsum(s)}));
+  const tv=rows.reduce((a,x)=>a+x.v,0),tr=rows.reduce((a,x)=>a+x.r,0);
+  const rate=(r,v)=>v?pc(r/v):'–';
+  $('#visitAsOf').textContent=`방문 기록 ${d0} ~ ${d1} (${days.length}일) · 테스트 방문 제외`;
+  const kpi=k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${k[2]}</div></div>`;
+  let h=`<div class="grid kpis">${[
+    ['전체 방문',tv+'<small>회</small>',`응답 ${tr}건 · 방문 대비 ${rate(tr,tv)}`],
+    ...rows.map(x=>[x.t,x.v+'<small>회</small>',`응답 ${x.r}건 · 방문 대비 ${rate(x.r,x.v)}`]),
+    ['하루 평균 방문',(tv/days.length).toFixed(1)+'<small>회</small>',`가장 많은 날 ${(()=>{let b=['',-1];days.forEach(d=>{const n=VISITS.filter(x=>x.d===d).reduce((a,x)=>a+x.v,0);if(n>b[1])b=[d,n];});return b[0].slice(5)+' · '+b[1]+'회';})()}`]
+  ].map(kpi).join('')}</div>`;
+  // 일자별 방문(막대) + 표
+  const cnt=days.map(d=>({d,a:VISITS.filter(x=>x.d===d&&x.s==='수강생용').reduce((a,x)=>a+x.v,0),b:VISITS.filter(x=>x.d===d&&x.s==='수요조사').reduce((a,x)=>a+x.v,0)}));
+  const mx=Math.max(...cnt.map(c=>c.a+c.b),1),W=520,H=150,step=(W-40)/cnt.length,bw=Math.min(28,step-4);
+  let s=`<svg viewBox="0 0 ${W} ${H+26}" width="100%" role="img" aria-label="일자별 방문 수">`;
+  cnt.forEach((c,i)=>{const x=30+i*step,ha=(c.a/mx)*H,hb=(c.b/mx)*H;
+    s+=`<rect x="${x}" y="${H-ha}" width="${bw}" height="${ha}" rx="2" style="fill:var(--acc)"><title>${c.d} 수강생용 ${c.a}회</title></rect>`;
+    s+=`<rect x="${x}" y="${H-ha-hb}" width="${bw}" height="${hb}" rx="2" style="fill:var(--hl)" opacity=".75"><title>${c.d} 수요조사 ${c.b}회</title></rect>`;
+    if(i%Math.ceil(cnt.length/7)===0)s+=`<text x="${x+bw/2}" y="${H+16}" font-size="10" text-anchor="middle" style="fill:var(--ink3)">${c.d.slice(5)}</text>`;});
+  s+=`<line x1="24" x2="${W-6}" y1="${H}" y2="${H}" stroke="var(--line)"/></svg>`;
+  s+=`<div class="legend"><span><svg width="10" height="10"><rect width="10" height="10" rx="2" style="fill:var(--acc)"/></svg> 수강생용 설문</span><span><svg width="10" height="10"><rect width="10" height="10" rx="2" style="fill:var(--hl)" opacity=".75"/></svg> 수요조사 설문</span><span>최대 ${mx}회/일</span></div>`;
+  const tbl='<table><thead><tr><th>설문 (링크)</th><th class="num">방문</th><th class="num">같은 기간 응답</th><th class="num">방문 대비 응답</th></tr></thead><tbody>'+
+    rows.map(x=>`<tr><td>${x.t}<br><span class="muted" style="font-size:11.5px">${x.sub}</span></td><td class="num">${x.v}</td><td class="num">${x.r}</td><td class="num"><b>${rate(x.r,x.v)}</b></td></tr>`).join('')+
+    `<tr class="tot"><td>전체</td><td class="num">${tv}</td><td class="num">${tr}</td><td class="num"><b>${rate(tr,tv)}</b></td></tr></tbody></table>`;
+  h+=`<div class="grid two" style="margin-top:16px"><div><h3 class="opsh">일자별 방문</h3>${s}</div><div><h3 class="opsh">설문별 방문과 응답</h3><div class="tablewrap">${tbl}</div></div></div>`;
+  box.innerHTML=h;
+}
+
+function oFiltered(){
+  const g=$('#oGrp').value,c=$('#oCourse').value,q=$('#oQ').value.trim();
+  return DATA.filter(r=>(!g||r['그룹']===g)&&(!c||r['과정명']===c)&&(!q||Object.values(r).some(v=>String(v).includes(q))));
+}
+function oColumns(){
+  const keys=DATA.length?Object.keys(DATA[0]):[];
+  return $('#oCols').value==='all'?keys:SUMCOLS.filter(c=>keys.includes(c));
+}
+function renderTable(){
+  const rows=oFiltered(),cols=oColumns(),per=50,pages=Math.max(1,Math.ceil(rows.length/per));
+  if(oPage>pages)oPage=pages;
+  const page=rows.slice((oPage-1)*per,oPage*per),showD=$('#oCols').value==='sum';
+  $('#oTable').innerHTML='<thead><tr>'+cols.map(c=>`<th>${esc(clabel(c))}</th>`).join('')+(showD?'<th class="num">개인 DAQI</th>':'')+'</tr></thead><tbody>'+
+    page.map(r=>'<tr>'+cols.map(c=>`<td>${esc(c==='그룹'?gl(r[c]||''):(r[c]||''))}</td>`).join('')+(showD?`<td class="num">${f1(personDaqi(r))}</td>`:'')+'</tr>').join('')+'</tbody>';
+  $('#oInfo').textContent=`${rows.length}건 중 ${(oPage-1)*per+1}~${Math.min(oPage*per,rows.length)}건 표시`;
+  $('#oPager').innerHTML=pages>1?`<button class="btn" ${oPage<=1?'disabled':''} id="oPrev">이전</button><span class="muted">${oPage} / ${pages}</span><button class="btn" ${oPage>=pages?'disabled':''} id="oNext">다음</button>`:'';
+  if($('#oPrev'))$('#oPrev').onclick=()=>{oPage--;renderTable();};
+  if($('#oNext'))$('#oNext').onclick=()=>{oPage++;renderTable();};
+}
+function fillCourseSel(){
+  const sel=$('#oCourse'); if(!sel)return; const cur=sel.value;
+  sel.innerHTML='<option value="">전체 과정</option>'+COURSES.map(c=>`<option>${esc(c.n)}</option>`).join('')+'<option>기타</option>';
+  sel.value=cur;
+}
+['oGrp','oCourse','oCols','oQ'].forEach(id=>{const el=$('#'+id);if(el)el.oninput=el.onchange=()=>{oPage=1;renderTable();};});
+$('#oDown').onclick=()=>{
+  const rows=oFiltered(),cols=oColumns();
+  const csv=[cols.join(',')].concat(rows.map(r=>cols.map(c=>`"${String(r[c]||'').replace(/"/g,'""')}"`).join(','))).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
+  a.download=`DAQI_응답데이터_${new Date().toISOString().slice(0,10)}.csv`;a.click();toast('CSV를 내려받았습니다');};
+
+// 구글시트 연동: 개인정보(성명·휴대전화)를 뺀 연결용 시트의 게시 주소에서 응답 2개 탭 + 방문 기록 탭을 불러옴
+const AUTO_PUB="https://docs.google.com/spreadsheets/d/e/2PACX-1vQNLtnzgBvjB8T6sMu0ZdUsOg351uCubZm6Af53jj8OtGj_nqXk_5LFPRbnHu6br2eti_jBqHBKeOqZ",AUTO_GIDS=[2001, 2002, 0];
+// 게시 주소 하나(…/d/e/2PACX-…/pubhtml)만 넣어도 탭 3개의 CSV 주소로 바꿔 줌
+const pubUrls=u=>{const m=String(u).match(/^(https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/[^\/?#]+)/);if(!m||/output=csv/.test(u))return [u];return AUTO_GIDS.map(g=>`${m[1]}/pub?gid=${g}&single=true&output=csv`);};
+let shTimer=null,shBusy=false;
+async function shFetch(urls,quiet){
+  if(shBusy)return;shBusy=true;
+  try{const ts=await Promise.all(urls.map(async u=>{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(r.status);return r.text();}));
+    const m=ingest(ts,'집계 데이터',true);pubFail=false;
+    if(m){const d=new Date(),p2=n=>String(n).padStart(2,'0');$('#shMsg').textContent=`마지막으로 불러온 시각 ${p2(d.getHours())}:${p2(d.getMinutes())}${srcKind!=='sheet'?' · 응답을 읽지 못했습니다':''}`;}
+    else{pubFail=true;if(srcKind==='sample')setTail();$('#shMsg').textContent='응답 표를 찾지 못했습니다. 잠시 뒤 새로 고쳐 주십시오.';}
+  }catch(e){pubFail=true;if(srcKind==='sample')setTail();$('#shMsg').textContent='집계 데이터를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로 고쳐 주십시오.';}
+  shBusy=false;
+}
+const shUrls=()=>[...new Set([$('#shUrl').value.trim(),$('#shUrl2').value.trim(),$('#shUrl3').value.trim()].filter(Boolean).flatMap(pubUrls))];
+const shEvery=ms=>{if(shTimer)clearInterval(shTimer);shTimer=setInterval(()=>{if(shUrls().length)shFetch(shUrls(),true);},ms);};
+$('#shGo').onclick=()=>{const u=shUrls();if(!u.length)return;try{localStorage.setItem('daqi_sheet',$('#shUrl').value.trim());localStorage.setItem('daqi_sheet2',$('#shUrl2').value.trim());localStorage.setItem('daqi_sheet3',$('#shUrl3').value.trim());}catch(e){}shFetch(u);shEvery($('#shAuto').checked?60000:600000);};
+$('#shAuto').onchange=()=>{
+  if($('#shAuto').checked&&!shUrls().length){$('#shAuto').checked=false;toast('먼저 주소를 연결해 주십시오');return;}
+  shEvery($('#shAuto').checked?60000:600000);toast($('#shAuto').checked?'1분마다 다시 불러옵니다':'10분마다 다시 불러옵니다');};
+$('#cutLive').onchange=()=>{cutLive=$('#cutLive').checked;
+  if(cutOn&&(RAW.main||RAW.dem)){loadObjs(applyCut((RAW.main||[]).concat(RAW.dem||[])));setTail();}
+  const c2=$('#cutLive2');if(c2)c2.checked=cutLive;
+  toast(cutLive?'09:00 이후 응답까지 모두 표시합니다':'매일 오전 09:00 기준으로 집계합니다');};
+$('#cutLive2').onchange=()=>{$('#cutLive').checked=$('#cutLive2').checked;$('#cutLive').onchange();};
+// (웹 게시본) 브라우저에 저장된 주소는 쓰지 않음
+if(!shUrls().length&&AUTO_PUB)$('#shUrl').value=AUTO_PUB+'/pubhtml';
+
+$('#csv2').onchange=onFiles;
+$('#reset2').onclick=resetSample;
+
+const _refresh=refresh;
+refresh=function(){_refresh.apply(this,arguments);try{renderOps();}catch(e){console.error(e);}};
+renderLinks();
+load(SAMPLE.cols,SAMPLE.rows);
+setTail();
+// 연결 주소가 있으면 열자마자 불러오고, 열어 두는 동안 10분마다 다시 불러옴(09:00이 지나면 집계 기준도 넘어감)
+if(shUrls().length){shFetch(shUrls(),true);shEvery(600000);}
+
+
+// 왼쪽 목차: 현재 보고 있는 섹션 표시
+(function(){const links=[...document.querySelectorAll('.rail a')];let partOf=null;
+  links.forEach(a=>{if(a.classList.contains('rp'))partOf=a.classList.contains('rp-q')?'pq':a.classList.contains('rp-d')?'pd':'pp';else a.classList.add(partOf);});
+  const hdr=document.querySelector('header.top');const setTop=()=>document.documentElement.style.setProperty('--railtop',(hdr.offsetHeight+16)+'px');setTop();addEventListener('resize',setTop);
+  const spy=()=>{if($('#pane-dash').hidden)return;const y=hdr.offsetHeight+40;let cur=null;
+    links.forEach(a=>{const t=document.getElementById(a.dataset.t);if(t&&t.getBoundingClientRect().top<=y)cur=a;});
+    if(!cur)cur=links[0];
+    if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=links[links.length-1];
+    let part=cur;if(!part.classList.contains('rp')){let i=links.indexOf(cur);while(i>0&&!links[i].classList.contains('rp'))i--;part=links[i];}
+    links.forEach(a=>{a.classList.toggle('on',a===cur);a.classList.toggle('in',a===part);if(a===cur)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');});};
+  addEventListener('scroll',spy,{passive:true});addEventListener('resize',spy);spy();
+  links.forEach(a=>a.addEventListener('click',()=>setTimeout(spy,400)));})();
+
+</script>
+</html>
